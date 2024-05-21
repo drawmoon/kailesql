@@ -1,4 +1,4 @@
-package klsql
+package saber
 
 // A table.
 type Table interface {

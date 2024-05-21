@@ -1,4 +1,4 @@
-package klsql
+package saber
 
 // A comparator to be used in conditions to form comparison predicates.
 type Comparator struct {

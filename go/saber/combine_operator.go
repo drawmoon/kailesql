@@ -1,4 +1,4 @@
-package klsql
+package saber
 
 // A combine operator is used to combine result sets of two arbitrary select queries.
 type CombineOperator struct{ keyword *Keyword }

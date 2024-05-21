@@ -1,29 +1,31 @@
-package klsql
+package saber
 
-// A base table.
-type BaseTable struct {
-	Name   string
-	Alias  string
-	Schema string
+// A table consisting of two joined tables and possibly a join condition.
+type JoinTable struct {
+	Lhs       *Table
+	Rhs       *Table
+	Type      interface{}
+	Hint      interface{}
+	Condition *Condition
 }
 
 // Gets a field from this table.
-func (b *BaseTable) Field(f string) *Field {
+func (j *JoinTable) Field(f string) *Field {
 	panic("not implemented") // TODO: Implement
 }
 
 // Sets the alias for the table.
-func (b *BaseTable) As(alias string) *Table {
+func (j *JoinTable) As(alias string) *Table {
 	panic("not implemented") // TODO: Implement
 }
 
 // Create a qualified asterisk expression from this table, table.* for use with SELECT.
-func (b *BaseTable) Asterisk() interface{} {
+func (j *JoinTable) Asterisk() interface{} {
 	panic("not implemented") // TODO: Implement
 }
 
 // Join a table to this table.
-func (b *BaseTable) Join(t *Table, jt interface{}, jh interface{}) *JoinTable {
+func (j *JoinTable) Join(t *Table, jt interface{}, jh interface{}) *JoinTable {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -32,7 +34,7 @@ func (b *BaseTable) Join(t *Table, jt interface{}, jh interface{}) *JoinTable {
 // Examples:
 //
 //	table.UseIndex("index1", "index2")
-func (b *BaseTable) UseIndex(i ...string) *Table {
+func (j *JoinTable) UseIndex(i ...string) *Table {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -41,7 +43,7 @@ func (b *BaseTable) UseIndex(i ...string) *Table {
 // Examples:
 //
 //	table.UseIndexForJoin("index1", "index2")
-func (b *BaseTable) UseIndexForJoin(i ...string) *Table {
+func (j *JoinTable) UseIndexForJoin(i ...string) *Table {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -50,7 +52,7 @@ func (b *BaseTable) UseIndexForJoin(i ...string) *Table {
 // Examples:
 //
 //	table.UseIndexForOrderBy("index1", "index2")
-func (b *BaseTable) UseIndexForOrderBy(i ...string) *Table {
+func (j *JoinTable) UseIndexForOrderBy(i ...string) *Table {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -59,7 +61,7 @@ func (b *BaseTable) UseIndexForOrderBy(i ...string) *Table {
 // Examples:
 //
 //	table.UseIndexForGroupBy("index1", "index2")
-func (b *BaseTable) UseIndexForGroupBy(i ...string) *Table {
+func (j *JoinTable) UseIndexForGroupBy(i ...string) *Table {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -68,7 +70,7 @@ func (b *BaseTable) UseIndexForGroupBy(i ...string) *Table {
 // Examples:
 //
 //	table.IgnoreIndex("index1", "index2")
-func (b *BaseTable) IgnoreIndex(i ...string) *Table {
+func (j *JoinTable) IgnoreIndex(i ...string) *Table {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -77,7 +79,7 @@ func (b *BaseTable) IgnoreIndex(i ...string) *Table {
 // Examples:
 //
 //	table.IgnoreIndexForJoin("index1", "index2")
-func (b *BaseTable) IgnoreIndexForJoin(i ...string) *Table {
+func (j *JoinTable) IgnoreIndexForJoin(i ...string) *Table {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -86,7 +88,7 @@ func (b *BaseTable) IgnoreIndexForJoin(i ...string) *Table {
 // Examples:
 //
 //	table.IgnoreIndexForOrderBy("index1", "index2")
-func (b *BaseTable) IgnoreIndexForOrderBy(i ...string) *Table {
+func (j *JoinTable) IgnoreIndexForOrderBy(i ...string) *Table {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -95,7 +97,7 @@ func (b *BaseTable) IgnoreIndexForOrderBy(i ...string) *Table {
 // Examples:
 //
 //	table.IgnoreIndexForGroupBy("index1", "index2")
-func (b *BaseTable) IgnoreIndexForGroupBy(i ...string) *Table {
+func (j *JoinTable) IgnoreIndexForGroupBy(i ...string) *Table {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -104,7 +106,7 @@ func (b *BaseTable) IgnoreIndexForGroupBy(i ...string) *Table {
 // Examples:
 //
 //	table.ForceIndex("index1", "index2")
-func (b *BaseTable) ForceIndex(i ...string) *Table {
+func (j *JoinTable) ForceIndex(i ...string) *Table {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -113,7 +115,7 @@ func (b *BaseTable) ForceIndex(i ...string) *Table {
 // Examples:
 //
 //	table.ForceIndexForJoin("index1", "index2")
-func (b *BaseTable) ForceIndexForJoin(i ...string) *Table {
+func (j *JoinTable) ForceIndexForJoin(i ...string) *Table {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -122,7 +124,7 @@ func (b *BaseTable) ForceIndexForJoin(i ...string) *Table {
 // Examples:
 //
 //	table.ForceIndexForOrderBy("index1", "index2")
-func (b *BaseTable) ForceIndexForOrderBy(i ...string) *Table {
+func (j *JoinTable) ForceIndexForOrderBy(i ...string) *Table {
 	panic("not implemented") // TODO: Implement
 }
 
@@ -131,6 +133,6 @@ func (b *BaseTable) ForceIndexForOrderBy(i ...string) *Table {
 // Examples:
 //
 //	table.ForceIndexForGroupBy("index1", "index2")
-func (b *BaseTable) ForceIndexForGroupBy(i ...string) *Table {
+func (j *JoinTable) ForceIndexForGroupBy(i ...string) *Table {
 	panic("not implemented") // TODO: Implement
 }

@@ -1,4 +1,4 @@
-package klsql
+package saber
 
 // An operator used for combining conditions.
 type Operator struct {
