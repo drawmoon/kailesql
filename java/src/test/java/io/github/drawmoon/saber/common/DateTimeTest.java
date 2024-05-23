@@ -35,13 +35,13 @@ public class DateTimeTest {
     DateTime dateTime = DateTime.parse(withZ);
 
     assertNotNull(dateTime);
-    assertEquals(withZ, dateTime.toString());
+    assertEquals(withZ, dateTime.toUtcString());
 
     String withoutZ = "2024-05-23T01:59:04.146";
     DateTime dateTime2 = DateTime.parse(withoutZ);
 
     assertNotNull(dateTime2);
-    assertEquals(withoutZ + "Z", dateTime2.toString());
+    assertEquals(withoutZ + "Z", dateTime2.toUtcString());
 
     String withOffset = "2024-05-23T10:18:00.892+08:00";
     DateTime dateTime3 = DateTime.parse(withOffset);

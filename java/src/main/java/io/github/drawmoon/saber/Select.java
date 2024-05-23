@@ -2,9 +2,6 @@
 
 package io.github.drawmoon.saber;
 
-import io.github.drawmoon.saber.impl.GroupField;
-import io.github.drawmoon.saber.impl.OrderField;
-
 /**
  * A select statement.
  *

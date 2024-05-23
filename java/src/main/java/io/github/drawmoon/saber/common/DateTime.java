@@ -3,6 +3,7 @@
 package io.github.drawmoon.saber.common;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static io.github.drawmoon.saber.common.Preconditions.checkNullOrWhiteSpace;
 
 import com.google.common.base.CharMatcher;
 import io.github.drawmoon.saber.exceptions.DateException;
@@ -70,7 +71,7 @@ final class DateTime implements Serializable {
    */
   @Nonnull
   public static DateTime parse(String text) {
-    checkNotNull(text);
+    checkNullOrWhiteSpace(text);
 
     try {
       return parseUtc(text);
@@ -104,7 +105,7 @@ final class DateTime implements Serializable {
    */
   @Nonnull
   public static DateTime parseNorm(String text) {
-    checkNotNull(text);
+    checkNullOrWhiteSpace(text);
 
     if (Pattern.matches(
         "\\d{4}[-/]\\d{1,2}[-/]\\d{1,2}(\\s\\d{1,2}:\\d{1,2}(:\\d{1,2})?)?(.\\d{1,6})?", text)) {
@@ -162,7 +163,7 @@ final class DateTime implements Serializable {
    */
   @Nonnull
   public static DateTime parseUtc(String text) {
-    checkNotNull(text);
+    checkNullOrWhiteSpace(text);
 
     DateTimeFormatter[] isoFormatters = {
       DateTimeFormatter.ISO_INSTANT, DateTimeFormatter.ISO_DATE_TIME
@@ -276,7 +277,7 @@ final class DateTime implements Serializable {
    * This enum is used to indentify DateTime instances in cases when they are known to be in local
    * time, UTC time or if this information has not been specified or is not applicable.
    */
-  static enum DateTimeKind {
+  public enum DateTimeKind {
     UNSPECIFIED,
     UTC,
     LOCAL
