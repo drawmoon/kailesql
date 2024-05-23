@@ -1,14 +1,14 @@
+/* Copyright 2024 drawmoon */
+
 package io.github.drawmoon.saber.impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ImmutableList;
-
 import io.github.drawmoon.saber.Condition;
 import io.github.drawmoon.saber.Field;
 import io.github.drawmoon.saber.Select;
 import io.github.drawmoon.saber.Table;
-
 import java.util.Arrays;
 
 /** A wrapper for a {@link Select}. */

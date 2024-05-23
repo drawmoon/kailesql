@@ -1,3 +1,5 @@
+/* Copyright 2024 drawmoon */
+
 package io.github.drawmoon.saber;
 
 import io.github.drawmoon.saber.impl.GroupField;
