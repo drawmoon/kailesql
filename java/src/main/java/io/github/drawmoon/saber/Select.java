@@ -10,7 +10,7 @@ package io.github.drawmoon.saber;
  * <p>
  *
  * <pre><code>
- * DSL.create(SQLDialect.MY_SQL)
+ * DSL.create(SqlDialect.MY_SQL)
  *   .select(fields)
  *   .from(table)
  *   .where(condition)

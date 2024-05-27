@@ -4,6 +4,9 @@ package io.github.drawmoon.saber.common;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.function.Function;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 public final class Preconditions {
 
@@ -31,12 +34,33 @@ public final class Preconditions {
   }
 
   /**
+   * Ensures that an collection passed as a parameter to the calling method is null or empty.
+   *
+   * @param <T> the type of the reference
+   * @param coll the collection to check for nullity
+   */
+  public static <T> void ensureCollectionEmpty(Collection<? extends T> coll) {
+    if (coll != null && !coll.isEmpty()) throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Ensures that an collection passed as a parameter to the calling method is null or empty.
+   *
+   * @param <T> the type of the reference
+   * @param coll the collection to check for nullity
+   * @param errorMessage the exception message to use if the check fails
+   */
+  public static <T> void ensureCollectionEmpty(Collection<? extends T> coll, String errorMessage) {
+    if (coll != null && !coll.isEmpty()) throw new UnsupportedOperationException(errorMessage);
+  }
+
+  /**
    * Ensure that the string is not null and is not an empty string.
    *
    * @param text the string to check
    */
-  public static void checkNullOrWhiteSpace(CharSequence text) {
-    checkNullOrWhiteSpace(text, null);
+  public static void checkNotWhiteSpace(CharSequence text) {
+    checkNotWhiteSpace(text, null);
   }
 
   /**
@@ -45,13 +69,13 @@ public final class Preconditions {
    * @param text the string to check
    * @param errorMessage the exception message to use if the check fails
    */
-  public static void checkNullOrWhiteSpace(CharSequence text, String errorMessage) {
+  public static void checkNotWhiteSpace(CharSequence text, String errorMessage) {
     if (text == null) throw new NullPointerException();
 
     boolean hasNotNullElement = false;
     for (int i = 0; i < text.length(); i++) {
       try {
-        checkWhiteSpace(text.charAt(i));
+        checkNotWhiteSpace(text.charAt(i));
         hasNotNullElement = true;
         break;
       } catch (NullPointerException e) {
@@ -66,7 +90,7 @@ public final class Preconditions {
    *
    * @param c the character to check
    */
-  public static void checkWhiteSpace(char c) {
+  public static void checkNotWhiteSpace(char c) {
     if (Character.isWhitespace(c)
         || Character.isSpaceChar(c)
         || c == '\ufeff'
@@ -98,6 +122,7 @@ public final class Preconditions {
    * @param coll the collection to check
    * @return the cleaned collection
    */
+  @Nonnull
   public static <T> LinkedList<T> collectionNullClean(Collection<? extends T> coll) {
     return collectionNullClean(coll, null);
   }
@@ -110,6 +135,7 @@ public final class Preconditions {
    * @param errorMessage the exception message to use if the check fails
    * @return the cleaned collection
    */
+  @Nonnull
   public static <T> LinkedList<T> collectionNullClean(
       Collection<? extends T> coll, String errorMessage) {
     if (coll == null) throw new NullPointerException(errorMessage);
@@ -121,5 +147,38 @@ public final class Preconditions {
     }
 
     return list;
+  }
+
+  /**
+   * Returns the object if it is not null, otherwise returns the default value.
+   *
+   * @param <T> the type of the reference
+   * @param t the object to check
+   * @param defaultValue the default value, not null
+   * @return the object, or the default value if the object is null
+   */
+  @Nonnull
+  public static <T> T nullSafe(T t, @CheckForNull T defaultValue) {
+    if (defaultValue == null) throw new NullPointerException();
+
+    return t == null ? defaultValue : t;
+  }
+
+  /**
+   * Execute the function and return the result, or null if the function throws an exception.
+   *
+   * @param <T> the type of the reference
+   * @param <R> the type of the reference
+   * @param execute a function to be executed that takes one argument and produces a result
+   * @param t input arguments to the function
+   * @return the result of the function, or null if the function throws an exception
+   */
+  @CheckForNull
+  public static <T, R> R executeSafe(Function<T, R> execute, T t) {
+    try {
+      return execute.apply(t);
+    } catch (Exception e) {
+      return null;
+    }
   }
 }

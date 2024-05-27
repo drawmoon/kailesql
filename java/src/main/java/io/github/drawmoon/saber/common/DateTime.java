@@ -3,7 +3,7 @@
 package io.github.drawmoon.saber.common;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static io.github.drawmoon.saber.common.Preconditions.checkNullOrWhiteSpace;
+import static io.github.drawmoon.saber.common.Preconditions.checkNotWhiteSpace;
 
 import com.google.common.base.CharMatcher;
 import io.github.drawmoon.saber.exceptions.DateException;
@@ -71,7 +71,7 @@ final class DateTime implements Serializable {
    */
   @Nonnull
   public static DateTime parse(String text) {
-    checkNullOrWhiteSpace(text);
+    checkNotWhiteSpace(text);
 
     try {
       return parseUtc(text);
@@ -105,7 +105,7 @@ final class DateTime implements Serializable {
    */
   @Nonnull
   public static DateTime parseNorm(String text) {
-    checkNullOrWhiteSpace(text);
+    checkNotWhiteSpace(text);
 
     if (Pattern.matches(
         "\\d{4}[-/]\\d{1,2}[-/]\\d{1,2}(\\s\\d{1,2}:\\d{1,2}(:\\d{1,2})?)?(.\\d{1,6})?", text)) {
@@ -163,7 +163,7 @@ final class DateTime implements Serializable {
    */
   @Nonnull
   public static DateTime parseUtc(String text) {
-    checkNullOrWhiteSpace(text);
+    checkNotWhiteSpace(text);
 
     DateTimeFormatter[] isoFormatters = {
       DateTimeFormatter.ISO_INSTANT, DateTimeFormatter.ISO_DATE_TIME

@@ -3,7 +3,7 @@
 package io.github.drawmoon.saber.impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static io.github.drawmoon.saber.common.Preconditions.checkNullOrWhiteSpace;
+import static io.github.drawmoon.saber.common.Preconditions.checkNotWhiteSpace;
 import static io.github.drawmoon.saber.common.Preconditions.collectionNullClean;
 import static io.github.drawmoon.saber.common.Preconditions.ensureNull;
 
@@ -33,7 +33,7 @@ final class SelectStatement implements Select {
   @Override
   public Select as(String alias) {
     ensureNull(this.alias);
-    checkNullOrWhiteSpace(alias, "alias cannot be null");
+    checkNotWhiteSpace(alias, "alias cannot be null");
 
     this.alias = alias;
     return this;
