@@ -12,6 +12,11 @@ public enum Operator {
 
   private final Keyword keyword;
 
+  /**
+   * Constructor.
+   *
+   * @param keyword the keyword, not null
+   */
   private Operator(String keyword) {
     this.keyword = Keyword.keyword(keyword);
   }

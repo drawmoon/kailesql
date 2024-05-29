@@ -2,9 +2,11 @@
 
 package io.github.drawmoon.saber.common;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
@@ -13,11 +15,60 @@ public final class Preconditions {
   private Preconditions() {}
 
   /**
+   * Ensures that an object reference passed as a parameter to the calling method is not null.
+   *
+   * @param <T> the type of the reference
+   * @param t1 the object reference to check for nullity
+   * @param t2 the object reference to check for nullity
+   */
+  public static <T> void checkNotNull(T t1, T t2) {
+    if (t1 == null || t2 == null) throw new NullPointerException();
+  }
+
+  /**
+   * Ensures that an object reference passed as a parameter to the calling method is not null.
+   *
+   * @param <T> the type of the reference
+   * @param t1 the object reference to check for nullity
+   * @param t2 the object reference to check for nullity
+   * @param errorMessage the exception message to use if the check fails
+   */
+  public static <T> void checkNotNull(T t1, T t2, String errorMessage) {
+    if (t1 == null || t2 == null) throw new NullPointerException(errorMessage);
+  }
+
+  /**
+   * Ensures that an object reference passed as a parameter to the calling method is not null.
+   *
+   * @param <T> the type of the reference
+   * @param t1 the object reference to check for nullity
+   * @param t2 the object reference to check for nullity
+   * @param t3 the object reference to check for nullity
+   */
+  public static <T> void checkNotNull(T t1, T t2, T t3) {
+    if (t1 == null || t2 == null) throw new NullPointerException();
+  }
+
+  /**
+   * Ensures that an object reference passed as a parameter to the calling method is not null.
+   *
+   * @param <T> the type of the reference
+   * @param t1 the object reference to check for nullity
+   * @param t2 the object reference to check for nullity
+   * @param t3 the object reference to check for nullity
+   * @param errorMessage the exception message to use if the check fails
+   */
+  public static <T> void checkNotNull(T t1, T t2, T t3, String errorMessage) {
+    if (t1 == null || t2 == null || t3 == null) throw new NullPointerException(errorMessage);
+  }
+
+  /**
    * Ensures that an object reference passed as a parameter to the calling method is null.
    *
    * @param <T> the type of the reference
    * @param obj the object reference to check for nullity
    */
+  @CanIgnoreReturnValue
   public static <T> void ensureNull(T obj) {
     if (obj != null) throw new UnsupportedOperationException();
   }
@@ -29,6 +80,7 @@ public final class Preconditions {
    * @param obj the object reference to check for nullity
    * @param errorMessage the exception message to use if the check fails
    */
+  @CanIgnoreReturnValue
   public static <T> void ensureNull(T obj, String errorMessage) {
     if (obj != null) throw new UnsupportedOperationException(errorMessage);
   }
@@ -162,6 +214,24 @@ public final class Preconditions {
     if (defaultValue == null) throw new NullPointerException();
 
     return t == null ? defaultValue : t;
+  }
+
+  /**
+   * Execute the function and return the result, or null if the function throws an exception.
+   *
+   * @param <T> the type of the reference
+   * @param <R> the type of the reference
+   * @param execute a function to be executed and produces a result
+   * @param t input arguments to the function
+   * @return the result of the function, or null if the function throws an exception
+   */
+  @CheckForNull
+  public static <T, R> R executeSafe(Supplier<R> execute) {
+    try {
+      return execute.get();
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   /**

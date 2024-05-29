@@ -16,10 +16,9 @@ import io.github.drawmoon.saber.Select;
 import io.github.drawmoon.saber.Table;
 import java.util.Arrays;
 import java.util.LinkedList;
-import javax.annotation.concurrent.Immutable;
+import javax.annotation.Nonnull;
 
 /** A wrapper for a {@link Select}. */
-@Immutable
 final class SelectStatement implements Select {
 
   String alias;
@@ -31,6 +30,7 @@ final class SelectStatement implements Select {
   ImmutableList<GroupField> groups;
 
   @Override
+  @Nonnull
   public Select as(String alias) {
     ensureNull(this.alias);
     checkNotWhiteSpace(alias, "alias cannot be null");
@@ -40,6 +40,7 @@ final class SelectStatement implements Select {
   }
 
   @Override
+  @Nonnull
   public Select from(Table t) {
     ensureNull(this.table);
     checkArgument(t != null, "table cannot be null");
@@ -49,6 +50,7 @@ final class SelectStatement implements Select {
   }
 
   @Override
+  @Nonnull
   public Select where(Condition c) {
     ensureNull(this.where);
     checkArgument(c != null, "condition cannot be null");
@@ -58,6 +60,7 @@ final class SelectStatement implements Select {
   }
 
   @Override
+  @Nonnull
   public Select having(Condition c) {
     ensureNull(this.having);
     checkArgument(c != null, "condition cannot be null");
@@ -67,6 +70,7 @@ final class SelectStatement implements Select {
   }
 
   @Override
+  @Nonnull
   public Select orderBy(OrderField... f) {
     ensureNull(this.orders);
     LinkedList<OrderField> fields =
@@ -77,6 +81,7 @@ final class SelectStatement implements Select {
   }
 
   @Override
+  @Nonnull
   public Select groupBy(GroupField... f) {
     ensureNull(this.groups);
     LinkedList<GroupField> fields =

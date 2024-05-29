@@ -24,6 +24,11 @@ public enum Comparator {
 
   private final Keyword keyword;
 
+  /**
+   * Constructor.
+   *
+   * @param keyword the keyword, not null
+   */
   private Comparator(String keyword) {
     this.keyword = Keyword.keyword(keyword);
   }

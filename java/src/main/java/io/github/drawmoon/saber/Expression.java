@@ -2,4 +2,5 @@
 
 package io.github.drawmoon.saber;
 
-public interface Expression {}
+/** The common base type for all operate objects. */
+public interface Expression extends Traversable<Expression>, Cloneable {}

@@ -2,12 +2,12 @@
 
 package io.github.drawmoon.saber;
 
+import javax.annotation.Nonnull;
+
 /**
  * A select statement.
  *
  * <p>Example:
- *
- * <p>
  *
  * <pre><code>
  * DSL.create(SqlDialect.MY_SQL)
@@ -23,48 +23,54 @@ public interface Select {
   /**
    * Sets the alias for the select statement.
    *
-   * @param alias
-   * @return
+   * @param alias the alias, not null
+   * @return the select, not null
    */
+  @Nonnull
   Select as(String alias);
 
   /**
    * Sets the table to be queried.
    *
-   * @param t
-   * @return
+   * @param t the table, not null
+   * @return the select, not null
    */
+  @Nonnull
   Select from(Table t);
 
   /**
    * Sets the where clause.
    *
-   * @param c
-   * @return
+   * @param c the condition, not null
+   * @return the select, not null
    */
+  @Nonnull
   Select where(Condition c);
 
   /**
    * Sets the having clause.
    *
-   * @param c
-   * @return
+   * @param c the condition, not null
+   * @return the select, not null
    */
+  @Nonnull
   Select having(Condition c);
 
   /**
    * Sets the order by clause.
    *
-   * @param f
-   * @return
+   * @param f the order fields, not null
+   * @return the select, not null
    */
+  @Nonnull
   Select orderBy(OrderField... f);
 
   /**
    * Sets the group by clause.
    *
-   * @param f
-   * @return
+   * @param f the group fields, not null
+   * @return the select, not null
    */
+  @Nonnull
   Select groupBy(GroupField... f);
 }
