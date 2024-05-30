@@ -19,37 +19,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.drawmoon.saber;
+package io.github.drawmoon.saber.common;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+/** Represents an 2-tuple, or pair. */
+public final class BiTuple<T1, T2> {
 
-/** The join hint type. */
-public enum JoinHint {
-  HASH("hash"),
-  LOOP("loop"),
-  MERGE("merge"),
-  REMOTE("remote");
-
-  private final Keyword keyword;
+  private final T1 item1;
+  private final T2 item2;
 
   /**
-   * Constructor.
+   * Constructs.
    *
-   * @param keyword the keyword, not null
+   * @param item1 the value of the current tuple object's first component
+   * @param item2 the value of the current tuple object's second component
    */
-  private JoinHint(String keyword) {
-    this.keyword = Keyword.keyword(keyword);
+  public BiTuple(T1 item1, T2 item2) {
+    this.item1 = item1;
+    this.item2 = item2;
   }
 
   /**
-   * Accept a {@link SqlGenerator} object in order to render a SQL string or to bind its variables.
+   * Gets the value of the current tuple object's first component.
    *
-   * @param gen The {@link SqlGenerator} object to accept, not null
-   * @return The rendered SQL string, not null
+   * @return the value of the tuple
    */
-  @Nonnull
-  public String accept(@CheckForNull SqlGenerator gen) {
-    return this.keyword.accept(gen);
+  public T1 item1() {
+    return item1;
+  }
+
+  /**
+   * Gets the value of the current tuple object's second component.
+   *
+   * @return the value of the tuple
+   */
+  public T2 item2() {
+    return item2;
   }
 }

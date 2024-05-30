@@ -1,5 +1,24 @@
-/* Copyright 2024 drawmoon */
-
+/*
+ *            _
+ *  ___  __ _| |__   ___ _ __
+ * / __|/ _` | '_ \ / _ \ '__|
+ * \__ \ (_| | |_) |  __/ |
+ * |___/\__,_|_.__/ \___|_|
+ *
+ * Copyright 2024 drash
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.github.drawmoon.saber;
 
 import com.google.common.collect.ImmutableList;
@@ -68,9 +87,10 @@ public interface Table {
   /**
    * Use the index hints for this table.
    *
-   * <p>Examples:
+   * <p>Example usages:
    *
-   * <pre><code>table.UseIndex("index1", "index2")</code></pre>
+   * <pre>
+   *   table.UseIndex("index1", "index2")</pre>
    *
    * @param i the index hints, not null
    * @return returns the table, not null
@@ -81,9 +101,10 @@ public interface Table {
   /**
    * Use the index hints for this table.
    *
-   * <p>Examples:
+   * <p>Example usages:
    *
-   * <pre><code>table.UseIndexForJoin("index1", "index2")</code></pre>
+   * <pre>
+   *   table.UseIndexForJoin("index1", "index2")</pre>
    *
    * @param i the index hints, not null
    * @return returns the table, not null
@@ -94,9 +115,10 @@ public interface Table {
   /**
    * Use the index hints for this table.
    *
-   * <p>Examples:
+   * <p>Example usages:
    *
-   * <pre><code>table.UseIndexForOrderBy("index1", "index2")</code></pre>
+   * <pre>
+   *   table.UseIndexForOrderBy("index1", "index2")</pre>
    *
    * @param i the index hints, not null
    * @return returns the table, not null
@@ -107,9 +129,10 @@ public interface Table {
   /**
    * Use the index hints for this table.
    *
-   * <p>Examples:
+   * <p>Example usages:
    *
-   * <pre><code>table.UseIndexForGroupBy("index1", "index2")</code></pre>
+   * <pre>
+   *   table.UseIndexForGroupBy("index1", "index2")</pre>
    *
    * @param i the index hints, not null
    * @return returns the table, not null
@@ -120,9 +143,10 @@ public interface Table {
   /**
    * Ignore the index hints for this table.
    *
-   * <p>Examples:
+   * <p>Example usages:
    *
-   * <pre><code>table.IgnoreIndex("index1", "index2")</code></pre>
+   * <pre>
+   *   table.IgnoreIndex("index1", "index2")</pre>
    *
    * @param i the index hints, not null
    * @return returns the table, not null
@@ -133,9 +157,10 @@ public interface Table {
   /**
    * Ignore the index hints for this table.
    *
-   * <p>Examples:
+   * <p>Example usages:
    *
-   * <pre><code>table.IgnoreIndexForJoin("index1", "index2")</code></pre>
+   * <pre>
+   *   table.IgnoreIndexForJoin("index1", "index2")</pre>
    *
    * @param i the index hints, not null
    * @return returns the table, not null
@@ -146,9 +171,10 @@ public interface Table {
   /**
    * Ignore the index hints for this table.
    *
-   * <p>Examples:
+   * <p>Example usages:
    *
-   * <pre><code>table.IgnoreIndexForOrderBy("index1", "index2")</code></pre>
+   * <pre>
+   *   table.IgnoreIndexForOrderBy("index1", "index2")</pre>
    *
    * @param i the index hints, not null
    * @return returns the table, not null
@@ -159,9 +185,10 @@ public interface Table {
   /**
    * Ignore the index hints for this table.
    *
-   * <p>Examples:
+   * <p>Example usages:
    *
-   * <pre><code>table.IgnoreIndexForGroupBy("index1", "index2")</code></pre>
+   * <pre>
+   *   table.IgnoreIndexForGroupBy("index1", "index2")</pre>
    *
    * @param i the index hints, not null
    * @return returns the table, not null
@@ -172,9 +199,10 @@ public interface Table {
   /**
    * Ignore the index hints for this table.
    *
-   * <p>Examples:
+   * <p>Example usages:
    *
-   * <pre><code>table.ForceIndex("index1", "index2")</code></pre>
+   * <pre>
+   *   table.ForceIndex("index1", "index2")</pre>
    *
    * @param i the index hints, not null
    * @return returns the table, not null
@@ -185,9 +213,10 @@ public interface Table {
   /**
    * Ignore the index hints for this table.
    *
-   * <p>Examples:
+   * <p>Example usages:
    *
-   * <pre><code>table.ForceIndexForJoin("index1", "index2")</code></pre>
+   * <pre>
+   *   table.ForceIndexForJoin("index1", "index2")</pre>
    *
    * @param i the index hints, not null
    * @return returns the table, not null
@@ -198,9 +227,10 @@ public interface Table {
   /**
    * Ignore the index hints for this table.
    *
-   * <p>Examples:
+   * <p>Example usages:
    *
-   * <pre><code>table.ForceIndexForOrderBy("index1", "index2")</code></pre>
+   * <pre>
+   *   table.ForceIndexForOrderBy("index1", "index2")</pre>
    *
    * @param i the index hints, not null
    * @return returns the table, not null
@@ -211,9 +241,10 @@ public interface Table {
   /**
    * Ignore the index hints for this table.
    *
-   * <p>Examples:
+   * <p>Example usages:
    *
-   * <pre><code>table.ForceIndexForGroupBy("index1", "index2")</code></pre>
+   * <pre>
+   *   table.ForceIndexForGroupBy("index1", "index2")</pre>
    *
    * @param i the index hints, not null
    * @return returns the table, not null

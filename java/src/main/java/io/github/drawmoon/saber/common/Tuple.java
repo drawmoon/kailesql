@@ -19,19 +19,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.drawmoon.saber.impl;
+package io.github.drawmoon.saber.common;
 
-import io.github.drawmoon.saber.Condition;
-import io.github.drawmoon.saber.Operator;
+/** Represents a 1-tuple, or singleton. */
+public final class Tuple<T> {
 
-/**
- * The logical expression.
- *
- * <p>Combine this condition with another condition using the specified operator.
- */
-public final class Logical {
+  private final T item;
 
-  Condition Left;
-  Condition Right;
-  Operator Operator;
+  /**
+   * Constructs.
+   *
+   * @param item the value of the current tuple object's single component.
+   */
+  public Tuple(T item) {
+    this.item = item;
+  }
+
+  /**
+   * Gets the value of the tuple object's single component.
+   *
+   * @return the value of the tuple
+   */
+  public T item() {
+    return item;
+  }
 }

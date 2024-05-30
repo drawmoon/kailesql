@@ -63,8 +63,7 @@ spotless {
 		trimTrailingWhitespace()
 		googleJavaFormat('1.7')
 		formatAnnotations()
-		// licenseHeaderFile("$rootDir/LICENSE")
-		licenseHeader('/* Copyright 2024 drawmoon */\n\r')
+		licenseHeaderFile("$rootDir/HEADER.txt")
 	}
 }
 

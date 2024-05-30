@@ -19,19 +19,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.drawmoon.saber.impl;
-
-import io.github.drawmoon.saber.Condition;
-import io.github.drawmoon.saber.Operator;
-
-/**
- * The logical expression.
- *
- * <p>Combine this condition with another condition using the specified operator.
- */
-public final class Logical {
-
-  Condition Left;
-  Condition Right;
-  Operator Operator;
-}
