@@ -21,7 +21,6 @@
  */
 package io.github.drawmoon.saber.common;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.function.Function;
@@ -87,7 +86,6 @@ public final class Preconditions {
    * @param <T> the type of the reference
    * @param obj the object reference to check for nullity
    */
-  @CanIgnoreReturnValue
   public static <T> void ensureNull(T obj) {
     if (obj != null) throw new UnsupportedOperationException();
   }
@@ -99,7 +97,6 @@ public final class Preconditions {
    * @param obj the object reference to check for nullity
    * @param errorMessage the exception message to use if the check fails
    */
-  @CanIgnoreReturnValue
   public static <T> void ensureNull(T obj, String errorMessage) {
     if (obj != null) throw new UnsupportedOperationException(errorMessage);
   }
@@ -241,7 +238,6 @@ public final class Preconditions {
    * @param <T> the type of the reference
    * @param <R> the type of the reference
    * @param execute a function to be executed and produces a result
-   * @param t input arguments to the function
    * @return the result of the function, or null if the function throws an exception
    */
   @CheckForNull

@@ -21,6 +21,12 @@
  */
 package io.github.drawmoon.saber.common;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.common.collect.AbstractIterator;
+import com.google.errorprone.annotations.ForOverride;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -31,15 +37,45 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.StreamSupport;
 import javax.annotation.CheckForNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Utility methods pertaining to Collection instances. */
 public final class Sequence<T> implements Enumerable<T> {
 
-  private Sequence() {}
+  private final Iterable<T> iter;
 
-  public static <T> Sequence<T> it(Collection<T> coll) {
-    throw new UnsupportedOperationException();
+  /**
+   * Constructs.
+   *
+   * @param iter the iterator
+   */
+  private Sequence(@CheckForNull Iterable<T> iter) {
+    this.iter = checkNotNull(iter);
+  }
+
+  /**
+   * Creates an Sequence from a list of elements.
+   *
+   * @param <T> the type of elements in the list
+   * @param iter the elements
+   * @return the new sequence
+   */
+  public static <T> Sequence<T> it(Iterable<T> iter) {
+    return new Sequence<>(iter);
+  }
+
+  /**
+   * Returns a sequential ordered Sequence from start (inclusive) to end (inclusive) by an
+   * incremental step of 1.
+   *
+   * @param start the (inclusive) initial value
+   * @param end the inclusive upper bound
+   * @return the new sequence
+   */
+  public static Sequence<Integer> range(int start, int end) {
+    return it(new Sequence<>(new RangeIntTransform(start, end)));
   }
 
   /**
@@ -49,14 +85,19 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
-   * Sequence&lt;String&gt; seq = Sequence.it(list).filter(s -&gt s.startsWith("a"));</pre>
+   * Sequence&lt;String&gt; seq = Sequence.it(list).filter(s -&gt; s.startsWith("a"));</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["apple"]</pre>
    *
    * @param predicate a non-interfering, stateless predicate to apply to each element to determine
    *     if it should be included
    * @return the filtered Sequence
    */
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public Sequence<T> filter(Predicate<? super T> predicate) {
-    throw new UnsupportedOperationException();
+    return it(new FilteringTransform(this, predicate));
   }
 
   /**
@@ -66,8 +107,12 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
-   * Sequence&lt;String&gt; seq = Sequence.it(list).filter((s, i) -&gt s.startsWith("a") || i % 2 == 0);
+   * Sequence&lt;String&gt; seq = Sequence.it(list).filter((s, i) -&gt; s.startsWith("a") || i % 2 == 0);
    * </pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["apple", "pear"]</pre>
    *
    * @param predicate a non-interfering, stateless predicate to apply to each element to determine
    *     if it should be included
@@ -84,7 +129,11 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
-   * Sequence&lt;String&gt; seq = Sequence.it(list).filterNot(s -&gt s.startsWith("a"));</pre>
+   * Sequence&lt;String&gt; seq = Sequence.it(list).filterNot(s -&gt; s.startsWith("a"));</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["apple"]</pre>
    *
    * @param predicate a non-interfering, stateless predicate to apply to each element to determine
    *     if it should be included
@@ -101,8 +150,12 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
-   * Sequence&lt;String&gt; seq = Sequence.it(list).filterNot((s, i) -&gt s.startsWith("a") || i % 2 == 0);
+   * Sequence&lt;String&gt; seq = Sequence.it(list).filterNot((s, i) -&gt; s.startsWith("a") || i % 2 == 0);
    * </pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["apple", "pear"]</pre>
    *
    * @param predicate a non-interfering, stateless predicate to apply to each element to determine
    *     if it should be included
@@ -120,6 +173,10 @@ public final class Sequence<T> implements Enumerable<T> {
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("apple", null, "pear");
    * Sequence&lt;String&gt; seq = Sequence.it(list).filterNotNull();</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["apple", "pear"]</pre>
    *
    * @return the new Sequence
    */
@@ -139,6 +196,10 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * List&lt;Employee&gt; list = Arrays.asList(e1, e2);
    * Sequence&lt;String&gt; seq = Sequence.it(list).map(Employee::getName);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["John", "Jane"]</pre>
    *
    * @param <R> the type of the elements in the resulting Sequence
    * @param mapper the function to apply to each element
@@ -161,6 +222,10 @@ public final class Sequence<T> implements Enumerable<T> {
    * List&lt;Employee&gt; list = Arrays.asList(e1, e2);
    * Sequence&lt;String&gt; seq = Sequence.it(list).mapNotNull(Employee::getName);</pre>
    *
+   * <p>Example output:
+   *
+   * <pre>["John"]</pre>
+   *
    * @param <R> the type of the elements in the resulting Sequence
    * @param mapper the function to apply to each element
    * @return the new Sequence
@@ -182,6 +247,10 @@ public final class Sequence<T> implements Enumerable<T> {
    * List&lt;Employee&gt; list = Arrays.asList(e1, e2);
    * Sequence&lt;String&gt; seq = Sequence.it(list).parallelMap(Employee::getName);</pre>
    *
+   * <p>Example output:
+   *
+   * <pre>["John", "Jane"]</pre>
+   *
    * @param <R> the type of the elements in the resulting Sequence
    * @param mapper the function to apply to each element
    * @return the new Sequence
@@ -201,7 +270,11 @@ public final class Sequence<T> implements Enumerable<T> {
    * String[] e2 = new String[]{"c", "d"};
    *
    * List&lt;String[]&gt; list = Arrays.asList(e1, e2);
-   * Sequence&lt;String&gt; seq = Sequence.it(list).flatMap(x -> x);</pre>
+   * Sequence&lt;String&gt; seq = Sequence.it(list).flatMap(x -&gt; x);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["a", "b", "c", "d"]</pre>
    *
    * @param <R> the type of the elements in the resulting Sequence
    * @param mapper the function to apply to each element
@@ -218,7 +291,11 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
-   * Optional&lt;String&gt; op = Sequence.it(list).find(s -&gt s.startsWith("a"));</pre>
+   * Optional&lt;String&gt; op = Sequence.it(list).find(s -&gt; s.startsWith("a"));</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>"apple"</pre>
    *
    * @param predicate a non-interfering, stateless predicate to apply to each element to determine
    *     if it should be included
@@ -235,7 +312,11 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
-   * Optional&lt;String&gt; op = Sequence.it(list).findLast(s -&gt s.startsWith("a"));</pre>
+   * Optional&lt;String&gt; op = Sequence.it(list).findLast(s -&gt; s.startsWith("a"));</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>"apple"</pre>
    *
    * @param predicate a non-interfering, stateless predicate to apply to each element to determine
    *     if it should be included
@@ -252,7 +333,11 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
-   * Optional&lt;String&gt; op = Sequence.it(list).single(s -&gt s.startsWith("a"));</pre>
+   * Optional&lt;String&gt; op = Sequence.it(list).single(s -&gt; s.startsWith("a"));</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["apple"]</pre>
    *
    * @param predicate a non-interfering, stateless predicate to apply to each element to determine
    *     if it should be included
@@ -272,6 +357,10 @@ public final class Sequence<T> implements Enumerable<T> {
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
    * String firstElement = Sequence.it(list).first();</pre>
    *
+   * <p>Example output:
+   *
+   * <pre>"apple"</pre>
+   *
    * @return the first element
    * @throws NullPointerException if Sequence is empty or the selected element is null
    */
@@ -287,6 +376,10 @@ public final class Sequence<T> implements Enumerable<T> {
    * <pre>
    * List&lt;String&gt; list = Arrays.asList(null, "banana", "pear");
    * String firstElement = Sequence.it(list).firstNotNull();</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>"banana"</pre>
    *
    * @return the first element
    * @throws NullPointerException if Sequence is empty or the selected element is null
@@ -304,6 +397,10 @@ public final class Sequence<T> implements Enumerable<T> {
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
    * String firstElement = Sequence.it(list).firstOrNull();</pre>
    *
+   * <p>Example output:
+   *
+   * <pre>"apple"</pre>
+   *
    * @return returns null when Sequence is empty, or when the first element selected is null
    */
   @CheckForNull
@@ -319,6 +416,10 @@ public final class Sequence<T> implements Enumerable<T> {
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
    * String firstElement = Sequence.it(list).firstOrDefault("mango");</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>"apple"</pre>
    *
    * @param defaultValue the default value
    * @return the first element, or the given default value
@@ -336,6 +437,10 @@ public final class Sequence<T> implements Enumerable<T> {
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
    * int elementIndex = Sequence.it(list).indexOf("apple");</pre>
    *
+   * <p>Example output:
+   *
+   * <pre>0</pre>
+   *
    * @param element the element
    * @return the index of element
    */
@@ -350,7 +455,11 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
-   * Sequence&lt;String&gt seq = Sequence.it(list).skip(2);</pre>
+   * Sequence&lt;String&gt; seq = Sequence.it(list).skip(2);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["pear"]</pre>
    *
    * @param count the skip count
    * @return the new Sequence
@@ -366,7 +475,11 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
-   * Sequence&lt;String&gt seq = Sequence.it(list).take(2);</pre>
+   * Sequence&lt;String&gt; seq = Sequence.it(list).take(2);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["apple", "banana"]</pre>
    *
    * @param count the take count
    * @return the new Sequence
@@ -382,7 +495,11 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("apple", "banana", "pear");
-   * Sequence&lt;String&gt seq = Sequence.it(list).reversed();</pre>
+   * Sequence&lt;String&gt; seq = Sequence.it(list).reversed();</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["pear", "banana", "apple"]</pre>
    *
    * @return the new Sequence
    */
@@ -398,7 +515,11 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("a", "b", "c");
-   * Sequence&lt;String&gt seq = Sequence.it(list).sorted();</pre>
+   * Sequence&lt;String&gt; seq = Sequence.it(list).sorted();</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["a", "b", "c"]</pre>
    *
    * @return the new Sequence
    */
@@ -417,7 +538,11 @@ public final class Sequence<T> implements Enumerable<T> {
    * Employee e2 = new Employee("Jane", 25);
    *
    * List&lt;Employee&gt; list = Arrays.asList(e1, e2);
-   * Sequence&lt;Employee&gt seq = Sequence.it(list).sorted(x -&gt x.getAge() &lt; 30);</pre>
+   * Sequence&lt;Employee&gt; seq = Sequence.it(list).sorted(Employee::getAge);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>[Employee{"Jane", 25}, Employee{"John", 30}]</pre>
    *
    * @param comparator a non-interfering, stateless {@link Comparator} to be used to compare stream
    *     elements
@@ -434,10 +559,12 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("a", "b", "c");
-   * Sequence&lt;String&gt seq = Sequence.it(list).sortedDescending();</pre>
+   * Sequence&lt;String&gt; seq = Sequence.it(list).sortedDescending();</pre>
    *
-   * @param comparator a non-interfering, stateless {@link Comparator} to be used to compare stream
-   *     elements
+   * <p>Example output:
+   *
+   * <pre>["c", "b", "a"]</pre>
+   *
    * @return the new Sequence
    */
   public Sequence<T> sortedDescending() {
@@ -455,8 +582,12 @@ public final class Sequence<T> implements Enumerable<T> {
    * Employee e2 = new Employee("Jane", 25);
    *
    * List&lt;Employee&gt; list = Arrays.asList(e1, e2);
-   * Sequence&lt;Employee&gt seq = Sequence.it(list).sortedDescending(x -&gt x.getAge() &lt; 30);
+   * Sequence&lt;Employee&gt; seq = Sequence.it(list).sortedDescending(Employee::getAge);
    * </pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>[Employee{"John", 30}, Employee{"Jane", 25}]</pre>
    *
    * @param comparator a non-interfering, stateless {@link Comparator} to be used to compare stream
    *     elements
@@ -473,7 +604,11 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;Integer&gt; list = Arrays.asList(1, 2, 3);
-   * boolean b = Sequence.it(list).all(x -&gt x &gt; 0);</pre>
+   * boolean b = Sequence.it(list).all(x -&gt; x &gt; 0);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>true</pre>
    *
    * @param predicate a non-interfering, stateless predicate to apply to each element to determine
    *     if it should be included
@@ -490,7 +625,11 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;Integer&gt; list = Arrays.asList(1, 2, 3);
-   * boolean b = Sequence.it(list).any(x -&gt x &gt; 0);</pre>
+   * boolean b = Sequence.it(list).any(x -&gt; x &gt; 0);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>true</pre>
    *
    * @param predicate a non-interfering, stateless predicate to apply to each element to determine
    *     if it should be included
@@ -507,7 +646,11 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;Integer&gt; list = Arrays.asList(1, 2, 3);
-   * int num = Sequence.it(list).count(x -&gt x &gt; 0);</pre>
+   * int num = Sequence.it(list).count(x -&gt; x &gt; 0);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>3</pre>
    *
    * @param predicate a non-interfering, stateless predicate to apply to each element to determine
    *     if it should be included
@@ -526,6 +669,10 @@ public final class Sequence<T> implements Enumerable<T> {
    * List&lt;Integer&gt; list = Arrays.asList(1, 2, 3);
    * boolean b = Sequence.it(list).contains(1);</pre>
    *
+   * <p>Example output:
+   *
+   * <pre>true</pre>
+   *
    * @param value the value
    * @return true, or false
    */
@@ -541,6 +688,10 @@ public final class Sequence<T> implements Enumerable<T> {
    * <pre>
    * List&lt;Integer&gt; list = Arrays.asList(1, 2, 3);
    * Integer element = Sequence.it(list).elementAt(1);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>1</pre>
    *
    * @param index index of the element to return
    * @return the element at the specified position in this Sequence
@@ -560,6 +711,10 @@ public final class Sequence<T> implements Enumerable<T> {
    * <pre>
    * List&lt;Integer&gt; list = Arrays.asList(1, 2, 3);
    * Integer element = Sequence.it(list).elementAtOrElse(1, 1);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>1</pre>
    *
    * @param index index of the element to return
    * @param defaultValue the default value to return if the index is out of bounds
@@ -581,6 +736,10 @@ public final class Sequence<T> implements Enumerable<T> {
    * List&lt;Integer&gt; list = Arrays.asList(1, 2, 3);
    * Integer element = Sequence.it(list).elementAtOrElse(1, 1);</pre>
    *
+   * <p>Example output:
+   *
+   * <pre>1</pre>
+   *
    * @param index index of the element to return
    * @param function the callable function
    * @return the element at the specified position in this Sequence
@@ -600,6 +759,10 @@ public final class Sequence<T> implements Enumerable<T> {
    * List&lt;Integer&gt; list = Arrays.asList(1, 1, 2, 3);
    * Sequence&lt;Integer&gt; seq = Sequence.it(list).distinct();</pre>
    *
+   * <p>Example output:
+   *
+   * <pre>[1, 2, 3]</pre>
+   *
    * @return the new Sequence
    */
   public Sequence<T> distinct() {
@@ -613,7 +776,11 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;Integer&gt; list = Arrays.asList(1, 2, 3);
-   * Optional<Integer> op = Sequence.it(list).reduce((x, y) -> x + y);</pre>
+   * Optional&lt;Integer&gt; op = Sequence.it(list).reduce((x, y) -&gt; x + y);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>3</pre>
    *
    * @param function the function to apply to each element
    * @return the result
@@ -630,7 +797,12 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;Integer&gt; list = Arrays.asList(1, 2, 3, 4);
-   * Sequence<Grouping<Integer, Integer>> seq = Sequence.it(list).groupBy(x -> x % 2);</pre>
+   * Sequence&lt;Grouping&lt;Integer, Integer&gt;&gt; seq = Sequence.it(list).groupBy(x -&gt; x % 2);
+   * </pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>[(1, [1, 3]), (0, [2, 4])]</pre>
    *
    * @param <K> the type of the keys
    * @param function the function mapping input elements to keys
@@ -647,9 +819,17 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("a", "b", "c");
-   * Sequence.it(list).forEach((i, x) -> {
+   * Sequence.it(list).forEach((i, x) -&gt; {
    *   System.out.println(i + " " + x);
    * });</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>
+   * 0 a
+   * 1 b
+   * 2 c
+   * </pre>
    *
    * @param action The action to be performed for each element
    */
@@ -664,9 +844,17 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("a", "b", "c");
-   * Sequence.it(list).parallelForEach(x -> {
+   * Sequence.it(list).parallelForEach(x -&gt; {
    *   System.out.println(x);
    * });</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>
+   * a
+   * b
+   * c
+   * </pre>
    *
    * @param action a non-interfering action to perform on the elements
    */
@@ -681,14 +869,177 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * <pre>
    * List&lt;String&gt; list = Arrays.asList("a", "b", "c");
-   * Sequence.it(list).parallelForEach((i, x) -> {
+   * Sequence.it(list).parallelForEach((i, x) -&gt; {
    *   System.out.println(i + " " + x);
    * });</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>
+   * 0 a
+   * 1 b
+   * 2 c
+   * </pre>
    *
    * @param action a non-interfering action to perform on the elements
    */
   public void parallelForEach(BiConsumer<Integer, ? super T> action) {
     throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Returns a new Sequence of tuples, where each tuple contains two elements.
+   *
+   * <p>Example usages:
+   *
+   * <pre>
+   * List&lt;String&gt; list = Arrays.asList("a", "b", "c");
+   * List&lt;Integer&gt; list2 = Arrays.asList(1, 2, 3);
+   * Sequence.it(list).zip(list2);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>[("a", 1), ("b", 2), ("c", 3)]</pre>
+   *
+   * @param <U> the type of the second element
+   * @param coll the collection to zip with
+   * @return the new Sequence
+   */
+  public <U> Sequence<BiTuple<T, U>> zip(Collection<? extends U> coll) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Returns a sequence whose elements are shuffled randomly.
+   *
+   * <p>Example usages:
+   *
+   * <pre>
+   * List&lt;String&gt; list = Arrays.asList("a", "b", "c");
+   * Sequence.it(list).shuffled();</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["b", "a", "c"]</pre>
+   *
+   * @return the new Sequence
+   */
+  public Sequence<T> shuffled() {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Returns a Sequence of all elements of the given Sequence, followed by all elements of the given
+   * Sequence.
+   *
+   * <p>Example usages:
+   *
+   * <pre>
+   * List&lt;String&gt; list = Arrays.asList("a", "b");
+   * List&lt;String&gt; list2 = Arrays.asList("c", "d");
+   * Sequence.it(list).concat(list2);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["a", "b", "c", "d"]</pre>
+   *
+   * @param coll the collection to concat with
+   * @return the new Sequence
+   */
+  public Sequence<T> concat(Collection<? extends T> coll) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Returns a set containing all elements that are contained by both this collection and the
+   * specified collection.
+   *
+   * <p>Example usages:
+   *
+   * <pre>
+   * List&lt;String&gt; list = Arrays.asList("a", "b");
+   * List&lt;String&gt; list2 = Arrays.asList("b", "c");
+   * Sequence.it(list).intersect(list2);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["b"]</pre>
+   *
+   * @param coll the collection to intersect with
+   * @return the new Sequence
+   */
+  public Sequence<T> intersect(Collection<? extends T> coll) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Returns a set containing all distinct elements from both collections.
+   *
+   * <p>Example usages:
+   *
+   * <pre>
+   * List&lt;String&gt; list = Arrays.asList("a", "a", "b", "c");
+   * List&lt;String&gt; list2 = Arrays.asList("x", "v", "c");
+   * Sequence.it(list).union(list2);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["a", "b", "c", "x", "v"]</pre>
+   *
+   * @param coll the collection to union with
+   * @return the new Sequence
+   */
+  public Sequence<T> union(Collection<? extends T> coll) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Joins the elements of the given text into a string.
+   *
+   * <p>Example usages:
+   *
+   * <pre>
+   * List&lt;String&gt; list = Arrays.asList("a", "b", "c");
+   * Sequence.it(list).join(", ");</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>"a, b, c"</pre>
+   *
+   * @param text the text to join
+   * @return the joined string, not null
+   */
+  public String join(CharSequence text) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Returns the number of elements in this collection.
+   *
+   * @return the number
+   */
+  public long size() {
+    return StreamSupport.stream(iter.spliterator(), false).count();
+  }
+
+  /**
+   * Returns a list containing all elements of this collection.
+   *
+   * @return the new list
+   */
+  public ArrayList<T> toList() {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Returns a list containing all elements of this collection.
+   *
+   * @return the new list
+   */
+  public ArrayDeque<T> toDequeList() {
+    ArrayDeque<T> arrayDeque = new ArrayDeque<>();
+    for (T e : this) arrayDeque.add(e);
+    return arrayDeque;
   }
 
   @Override
@@ -698,13 +1049,36 @@ public final class Sequence<T> implements Enumerable<T> {
 
   @Override
   public Iterator<T> iterator() {
-    throw new UnsupportedOperationException();
+    return iter.iterator();
   }
 
   public static final class Grouping<K, V> implements Enumerable<V> {
 
-    K key;
-    Sequence<V> values;
+    private final K key;
+    private final Sequence<V> values;
+
+    public Grouping(@CheckForNull K key, Sequence<V> values) {
+      this.key = checkNotNull(key);
+      this.values = values;
+    }
+
+    /**
+     * Gets the key.
+     *
+     * @return the key, not null
+     */
+    public K key() {
+      return key;
+    }
+
+    /**
+     * Gets the values.
+     *
+     * @return the values
+     */
+    public Sequence<V> values() {
+      return values;
+    }
 
     @Override
     public <R> Enumerable<R> collect(Function<? super V, ? extends R> function) {
@@ -714,6 +1088,116 @@ public final class Sequence<T> implements Enumerable<T> {
     @Override
     public Iterator<V> iterator() {
       throw new UnsupportedOperationException();
+    }
+  }
+
+  public static final class IndexedValue<T> {
+
+    private final Integer index;
+    private final T value;
+
+    public IndexedValue(@CheckForNull Integer index, T value) {
+      this.index = checkNotNull(index);
+      this.value = value;
+    }
+
+    /**
+     * Gets the index.
+     *
+     * @return the index, not null
+     */
+    public Integer index() {
+      return index;
+    }
+
+    /**
+     * Gets the value.
+     *
+     * @return the value
+     */
+    public T value() {
+      return value;
+    }
+  }
+
+  static final class RangeIntTransform implements Iterable<Integer> {
+
+    private int from;
+    private final int upTo;
+
+    public RangeIntTransform(int from, int upTo) {
+      this.from = from;
+      this.upTo = upTo;
+    }
+
+    public int estimateSize() {
+      return upTo - from + 1;
+    }
+
+    @Override
+    public Iterator<Integer> iterator() {
+      return new AbstractIterator<Integer>() {
+        @Override
+        protected Integer computeNext() {
+          int size = estimateSize();
+          if (size <= 1 || from == upTo) return endOfData();
+          from++;
+          return from;
+        }
+      };
+    }
+  }
+
+  abstract static class SequenceTransform<T> implements Iterable<T> {
+
+    private final ArrayList<T> cache;
+    protected final Iterable<T> iter;
+
+    public SequenceTransform(Iterable<T> iter) {
+      this.iter = iter;
+      this.cache = new ArrayList<>();
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+      if (cache.isEmpty()) {
+        Iterator<T> iterator = tryTransform();
+        while (iterator.hasNext()) {
+          T next = iterator.next();
+          cache.add(next);
+        }
+      }
+      return cache.iterator();
+    }
+
+    @ForOverride
+    protected abstract Iterator<T> tryTransform();
+  }
+
+  static final class FilteringTransform<T> extends SequenceTransform<T> {
+
+    private final Predicate<? super T> predicate;
+
+    public FilteringTransform(Iterable<T> iter, Predicate<? super T> predicate) {
+      super(iter);
+      this.predicate = predicate;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Override
+    protected Iterator<T> tryTransform() {
+      Iterator<T> in = iter.iterator();
+
+      return new AbstractIterator() {
+        @Override
+        protected @Nullable Object computeNext() {
+          while (in.hasNext()) {
+            T next = in.next();
+            if (predicate.test(next)) return next;
+          }
+          return endOfData();
+        }
+      };
     }
   }
 }

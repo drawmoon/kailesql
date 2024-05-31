@@ -86,7 +86,7 @@ public final class BaseTable implements Table {
   public JoinTable Join(Table t, JoinType jt, @Nullable JoinHint jh) {
     checkNotNull(t, jt);
 
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override

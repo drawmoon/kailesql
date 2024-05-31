@@ -21,7 +21,7 @@
  */
 package io.github.drawmoon.saber;
 
-import static io.github.drawmoon.saber.common.Preconditions.*;
+import static io.github.drawmoon.saber.common.Preconditions.checkNotWhiteSpace;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -56,6 +56,6 @@ public final class Keyword {
    */
   @Nonnull
   public String accept(@CheckForNull SqlGenerator gen) {
-    return null;
+    return keyword; // TODO: Implementing dsl style formatting
   }
 }

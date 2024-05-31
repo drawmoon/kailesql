@@ -55,7 +55,7 @@ final class DateTime implements Serializable {
    */
   @Nonnull
   public static DateTime now() {
-    return new DateTime(ZonedDateTime.now());
+    return new DateTime(ZonedDateTime.now(ZoneId.systemDefault()));
   }
 
   /**
