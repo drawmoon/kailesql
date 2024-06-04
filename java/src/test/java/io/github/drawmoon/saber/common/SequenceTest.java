@@ -21,10 +21,9 @@
  */
 package io.github.drawmoon.saber.common;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayDeque;

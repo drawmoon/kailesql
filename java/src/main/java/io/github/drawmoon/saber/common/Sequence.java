@@ -888,6 +888,25 @@ public final class Sequence<T> implements Enumerable<T> {
   }
 
   /**
+   * Returns a sequence of all elements from all sequences in this sequence.
+   *
+   * <p>Example usages:
+   *
+   * <pre>
+   * List&lt;List&lt;String&gt;&gt; list = Arrays.asList(Arrays.asList("a", "b"), Arrays.asList("c", "d"));
+   * Sequence.it(list).flatten();</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>["a", "b", "c", "d"]</pre>
+   *
+   * @return the new Sequence
+   */
+  public Sequence<T> flatten() {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
    * Returns a new Sequence of tuples, where each tuple contains two elements.
    *
    * <p>Example usages:
