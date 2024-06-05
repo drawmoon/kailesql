@@ -929,6 +929,26 @@ public final class Sequence<T> implements Enumerable<T> {
   }
 
   /**
+   * Returns consecutive sub-lists of a list, each of the same size (the final list may be smaller).
+   *
+   * <p>Example usages:
+   *
+   * <pre>
+   * List&lt;String&gt; list = Arrays.asList("a", "b", "c", "d", "e");
+   * Sequence.it(list).partition(3);</pre>
+   *
+   * <p>Example output:
+   *
+   * <pre>[["a", "b", "c"], ["d", "e"]]</pre>
+   *
+   * @param size the desired size of each sub-list (the last may be smaller)
+   * @return the new Sequence
+   */
+  public Sequence<Sequence<T>> partition(int size) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
    * Returns a sequence whose elements are shuffled randomly.
    *
    * <p>Example usages:
@@ -1047,7 +1067,9 @@ public final class Sequence<T> implements Enumerable<T> {
    * @return the new list
    */
   public ArrayList<T> toList() {
-    throw new UnsupportedOperationException();
+    ArrayList<T> arrayList = new ArrayList<>();
+    for (T e : this) arrayList.add(e);
+    return arrayList;
   }
 
   /**
@@ -1112,11 +1134,11 @@ public final class Sequence<T> implements Enumerable<T> {
 
   public static final class IndexedValue<T> {
 
-    private final Integer index;
+    private final int index;
     private final T value;
 
-    public IndexedValue(@CheckForNull Integer index, T value) {
-      this.index = checkNotNull(index);
+    public IndexedValue(int index, T value) {
+      this.index = index;
       this.value = value;
     }
 
@@ -1125,7 +1147,7 @@ public final class Sequence<T> implements Enumerable<T> {
      *
      * @return the index, not null
      */
-    public Integer index() {
+    public int index() {
       return index;
     }
 
