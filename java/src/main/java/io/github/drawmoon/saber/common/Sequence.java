@@ -39,9 +39,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Utility methods pertaining to Collection instances. */
+@SuppressWarnings("unused")
 public final class Sequence<T> implements Enumerable<T> {
 
   private final Iterable<T> iter;
@@ -1066,6 +1068,8 @@ public final class Sequence<T> implements Enumerable<T> {
    *
    * @return the new list
    */
+  @Override
+  @Nonnull
   public ArrayList<T> toList() {
     ArrayList<T> arrayList = new ArrayList<>();
     for (T e : this) arrayList.add(e);
@@ -1084,11 +1088,13 @@ public final class Sequence<T> implements Enumerable<T> {
   }
 
   @Override
+  @Nonnull
   public <R> Enumerable<R> collect(Function<? super T, ? extends R> function) {
     throw new UnsupportedOperationException();
   }
 
   @Override
+  @Nonnull
   public Iterator<T> iterator() {
     return iter.iterator();
   }
@@ -1122,12 +1128,20 @@ public final class Sequence<T> implements Enumerable<T> {
     }
 
     @Override
+    @Nonnull
     public <R> Enumerable<R> collect(Function<? super V, ? extends R> function) {
       throw new UnsupportedOperationException();
     }
 
     @Override
+    @Nonnull
     public Iterator<V> iterator() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    @Nonnull
+    public ArrayList<V> toList() {
       throw new UnsupportedOperationException();
     }
   }
@@ -1176,6 +1190,7 @@ public final class Sequence<T> implements Enumerable<T> {
     }
 
     @Override
+    @Nonnull
     public Iterator<Integer> iterator() {
       return new AbstractIterator<Integer>() {
         @Override
@@ -1200,6 +1215,7 @@ public final class Sequence<T> implements Enumerable<T> {
     }
 
     @Override
+    @Nonnull
     public Iterator<T> iterator() {
       if (cache.isEmpty()) {
         Iterator<T> iterator = tryTransform();

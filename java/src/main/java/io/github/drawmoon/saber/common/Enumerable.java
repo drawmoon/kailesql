@@ -21,12 +21,15 @@
  */
 package io.github.drawmoon.saber.common;
 
+import java.util.ArrayList;
 import java.util.function.Function;
+import javax.annotation.Nonnull;
 
 /**
  * An interface for inherently recursive, multi-valued data structures. The order of elements is
  * determined by {@link Iterable#iterator()}, which may vary each time it is called.
  */
+@SuppressWarnings("unused")
 public interface Enumerable<T> extends Iterable<T> {
 
   /**
@@ -37,5 +40,14 @@ public interface Enumerable<T> extends Iterable<T> {
    * @param function a function that is not necessarily defined of all elements of this traversable
    * @return a new <code>Traversable</code> instance containing elements of type <code>R</code>
    */
+  @Nonnull
   <R> Enumerable<R> collect(Function<? super T, ? extends R> function);
+
+  /**
+   * Returns a list containing all elements of this collection.
+   *
+   * @return the new list
+   */
+  @Nonnull
+  ArrayList<T> toList();
 }

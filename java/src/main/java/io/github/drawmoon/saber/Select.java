@@ -37,6 +37,7 @@ import javax.annotation.Nonnull;
  *      .groupBy(field2);
  * </pre>
  */
+@SuppressWarnings("unused")
 public interface Select {
 
   /**

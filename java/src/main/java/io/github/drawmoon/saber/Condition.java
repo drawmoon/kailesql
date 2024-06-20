@@ -27,6 +27,7 @@ package io.github.drawmoon.saber;
  * <p>Conditions can be used in a variety of SQL clauses. They're mainly used in a Select
  * statement's WHERE clause.
  */
+@SuppressWarnings("unused")
 public interface Condition extends Expression {
 
   /**

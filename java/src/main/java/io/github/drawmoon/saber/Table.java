@@ -28,6 +28,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /** A table. */
+@SuppressWarnings("unused")
 public interface Table {
 
   /**
