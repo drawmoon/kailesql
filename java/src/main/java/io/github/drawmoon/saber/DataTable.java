@@ -21,6 +21,7 @@
  */
 package io.github.drawmoon.saber;
 
+import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.github.drawmoon.saber.common.Preconditions.checkNotWhiteSpace;
 
@@ -117,7 +118,7 @@ public final class DataTable implements Enumerable<DataTable.DataColumn> {
   @Override
   @Nonnull
   public Iterator<DataColumn> iterator() {
-    throw new UnsupportedOperationException();
+    return this.columns.iterator();
   }
 
   @Override
@@ -129,7 +130,7 @@ public final class DataTable implements Enumerable<DataTable.DataColumn> {
   @Override
   @Nonnull
   public ArrayList<DataColumn> toList() {
-    throw new UnsupportedOperationException();
+    return this.columns.toList();
   }
 
   @SuppressWarnings("unused")
@@ -159,46 +160,68 @@ public final class DataTable implements Enumerable<DataTable.DataColumn> {
       throw new UnsupportedOperationException();
     }
 
-    public boolean isNull(String columnName) {
+    public boolean isNull(@CheckForNull String columnName) {
+      checkNotWhiteSpace(columnName);
+      if (this.columns.isEmpty()) throw new IllegalStateException("No columns in table");
+
+      DataColumn column = this.columns.get(columnName);
+      return this.isNull(column);
+    }
+
+    public boolean isNull(@CheckForNull int columnIndex) {
+      checkElementIndex(columnIndex, this.columns.size());
+      if (this.columns.isEmpty()) throw new IllegalStateException("No columns in table");
+
+      DataColumn column = this.columns.get(columnIndex);
+      return this.isNull(column);
+    }
+
+    public boolean isNull(@CheckForNull DataColumn column) {
+      checkNotNull(column);
+      if (this.columns.isEmpty()) throw new IllegalStateException("No columns in table");
+
       throw new UnsupportedOperationException();
     }
 
-    public boolean isNull(int columnIndex) {
-      throw new UnsupportedOperationException();
-    }
+    public Object getObject(@CheckForNull String columnName) {
+      checkNotWhiteSpace(columnName);
+      if (this.columns.isEmpty()) throw new IllegalStateException("No columns in table");
 
-    public boolean isNull(DataColumn column) {
-      throw new UnsupportedOperationException();
-    }
-
-    public Object getObject(String columnName) {
-      throw new UnsupportedOperationException();
+      DataColumn column = this.columns.get(columnName);
+      return this.getObject(column);
     }
 
     public Object getObject(int columnIndex) {
-      throw new UnsupportedOperationException();
+      checkElementIndex(columnIndex, this.columns.size());
+      if (this.columns.isEmpty()) throw new IllegalStateException("No columns in table");
+
+      DataColumn column = this.columns.get(columnIndex);
+      return this.getObject(column);
     }
 
-    public Object getObject(DataColumn column) {
+    public Object getObject(@CheckForNull DataColumn column) {
+      checkNotNull(column);
+      if (this.columns.isEmpty()) throw new IllegalStateException("No columns in table");
+
       throw new UnsupportedOperationException();
     }
 
     @Override
     @Nonnull
     public <R> Enumerable<R> collect(Function<? super Object, ? extends R> function) {
-      throw new UnsupportedOperationException();
+      return Sequence.it(this).map(function);
     }
 
     @Override
     @Nonnull
     public Iterator<Object> iterator() {
-      throw new UnsupportedOperationException();
+      return Sequence.it(this).iterator();
     }
 
     @Override
     @Nonnull
     public ArrayList<Object> toList() {
-      throw new UnsupportedOperationException();
+      return Sequence.it(this).toList();
     }
   }
 
@@ -222,19 +245,19 @@ public final class DataTable implements Enumerable<DataTable.DataColumn> {
     @Override
     @Nonnull
     public Iterator<Object> iterator() {
-      throw new UnsupportedOperationException();
+      return Sequence.it(this).iterator();
     }
 
     @Override
     @Nonnull
     public <R> Enumerable<R> collect(Function<? super Object, ? extends R> function) {
-      throw new UnsupportedOperationException();
+      return Sequence.it(this).map(function);
     }
 
     @Override
     @Nonnull
     public ArrayList<Object> toList() {
-      throw new UnsupportedOperationException();
+      return Sequence.it(this).toList();
     }
   }
 
@@ -253,13 +276,13 @@ public final class DataTable implements Enumerable<DataTable.DataColumn> {
     @Override
     @Nonnull
     public <R> Enumerable<R> collect(Function<? super DataColumn, ? extends R> function) {
-      throw new UnsupportedOperationException();
+      return Sequence.it(this).map(function);
     }
 
     @Override
     @Nonnull
     public ArrayList<DataColumn> toList() {
-      throw new UnsupportedOperationException();
+      return Sequence.it(this).toList();
     }
   }
 
@@ -267,13 +290,13 @@ public final class DataTable implements Enumerable<DataTable.DataColumn> {
     @Override
     @Nonnull
     public <R> Enumerable<R> collect(Function<? super DataRow, ? extends R> function) {
-      throw new UnsupportedOperationException();
+      return Sequence.it(this).map(function);
     }
 
     @Override
     @Nonnull
     public ArrayList<DataRow> toList() {
-      throw new UnsupportedOperationException();
+      return Sequence.it(this).toList();
     }
   }
 }
