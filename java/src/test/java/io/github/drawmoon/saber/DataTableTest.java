@@ -39,7 +39,7 @@ public class DataTableTest {
     table.addColumn(new DataColumn("age"));
 
     DataRow firstRow = table.newRow();
-    firstRow.setRowData("name", "drash");
+    firstRow.setRowData("name", "darsh");
     firstRow.setRowData("age", 18);
     table.addRow(firstRow);
 
@@ -50,7 +50,7 @@ public class DataTableTest {
 
     assertEquals(2, table.rowCount());
 
-    Object[] expectedNameList = new Object[] {"drash", "saber"};
+    Object[] expectedNameList = new Object[] {"darsh", "saber"};
     Object[] expectedAgeList = new Object[] {18, 19};
 
     int rowIndex = 0;
@@ -77,7 +77,7 @@ public class DataTableTest {
     table.addRow(firstRow);
 
     DataRow secondRow = table.newRow();
-    secondRow.setRowData("name", "sarbe");
+    secondRow.setRowData("name", "saber");
     secondRow.setRowData("age", 19);
     table.addRow(secondRow);
 
@@ -85,16 +85,31 @@ public class DataTableTest {
     String json = om.writeValueAsString(table);
 
     assertNotNull(json);
-    assertEquals("[{\"name\":\"darsh\",\"age\":18},{\"name\":\"sarbe\",\"age\":19}]", json);
+    assertEquals("[{\"name\":\"darsh\",\"age\":18},{\"name\":\"saber\",\"age\":19}]", json);
   }
 
   @Test
   public void deserialTest() throws JsonMappingException, JsonProcessingException {
-    String jsonStr = "[{\"name\":\"darsh\",\"age\":18},{\"name\":\"sarbe\",\"age\":19}]";
+    String jsonStr = "[{\"name\":\"darsh\",\"age\":18},{\"name\":\"saber\",\"age\":19}]";
 
     ObjectMapper om = new ObjectMapper();
     DataTable table = om.readValue(jsonStr, DataTable.class);
 
     assertNotNull(table);
+    assertEquals(2, table.rowCount());
+
+    Object[] expectedNameList = new Object[] {"darsh", "saber"};
+    Object[] expectedAgeList = new Object[] {18, 19};
+
+    int rowIndex = 0;
+    for (DataRow row : table) {
+      Object name = row.getObject("name");
+      Object age = row.getObject("age");
+
+      assertEquals(expectedNameList[rowIndex], name);
+      assertEquals(expectedAgeList[rowIndex], age);
+
+      rowIndex++;
+    }
   }
 }
