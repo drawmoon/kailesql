@@ -46,6 +46,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @SuppressWarnings("unused")
 public final class Sequence<T> implements Enumerable<T> {
 
+  private static final long serialVersionUID = -8492251942206794476L;
+
   private final Iterable<T> iter;
 
   /**
@@ -347,7 +349,15 @@ public final class Sequence<T> implements Enumerable<T> {
    * @throws IllegalStateException when there is more than one element that matches the predicate
    */
   public Optional<T> single(Predicate<? super T> predicate) {
-    throw new UnsupportedOperationException();
+    Sequence<T> seq = this.filter(predicate);
+    T single = null;
+    boolean found = false;
+    for (T t : seq) {
+      if (found) throw new IllegalStateException("More than one element matches the predicate");
+      found = true;
+      single = t;
+    }
+    return Optional.ofNullable(single);
   }
 
   /**

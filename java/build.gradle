@@ -19,6 +19,7 @@ if (!project.hasProperty('release')) {
 ext {
 	junitVersion = '5.10.0'
 	hamcrestVersion = '2.2'
+	jacksonVersion = '2.14.2'
 	guavaVersion = '32.1.3-jre'
 	errorproneVersion = '2.10.0'
 }
@@ -32,6 +33,10 @@ dependencies {
 	testImplementation "org.junit.jupiter:junit-jupiter"
 	testImplementation "org.hamcrest:hamcrest:$hamcrestVersion"
 
+
+	implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+	implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+	implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
 	implementation "com.google.guava:guava:$guavaVersion"
 	errorprone "com.google.errorprone:error_prone_core:$errorproneVersion"
 }

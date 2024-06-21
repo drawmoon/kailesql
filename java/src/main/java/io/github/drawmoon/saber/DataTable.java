@@ -25,19 +25,37 @@ import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.github.drawmoon.saber.common.Preconditions.checkNotWhiteSpace;
 
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.collect.AbstractIterator;
 import io.github.drawmoon.saber.common.Enumerable;
 import io.github.drawmoon.saber.common.Sequence;
-import java.util.ArrayDeque;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Optional;
 import java.util.function.Function;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** A DataTable is a collection of DataRows. It is a collection of rows and columns. */
 @SuppressWarnings("unused")
-public final class DataTable implements Enumerable<DataTable.DataColumn> {
+@JsonDeserialize(using = DataTable.DataTableJsonDeserializer.class)
+public final class DataTable implements Enumerable<DataTable.DataRow> {
+
+  private static final long serialVersionUID = -8492251942206794476L;
 
   private final DataColumnList columns;
   private final DataRowList rows;
@@ -55,6 +73,10 @@ public final class DataTable implements Enumerable<DataTable.DataColumn> {
 
   public Collection<DataRow> rows() {
     return this.rows;
+  }
+
+  public int rowCount() {
+    return this.rowCount;
   }
 
   /**
@@ -85,6 +107,7 @@ public final class DataTable implements Enumerable<DataTable.DataColumn> {
   public void addRow(@CheckForNull DataRow row) {
     if (row.table != this) throw new IllegalArgumentException("Row is not from this table");
 
+    row.setPosition(this.rowCount);
     this.rows.add(row);
     this.rowCount++;
   }
@@ -117,28 +140,31 @@ public final class DataTable implements Enumerable<DataTable.DataColumn> {
 
   @Override
   @Nonnull
-  public Iterator<DataColumn> iterator() {
-    return this.columns.iterator();
+  public Iterator<DataRow> iterator() {
+    return this.rows.iterator();
   }
 
   @Override
   @Nonnull
-  public <R> Enumerable<R> collect(Function<? super DataColumn, ? extends R> function) {
-    return Sequence.it(this.columns).map(function);
+  public <R> Enumerable<R> collect(Function<? super DataRow, ? extends R> function) {
+    return this.rows.collect(function);
   }
 
   @Override
   @Nonnull
-  public ArrayList<DataColumn> toList() {
-    return this.columns.toList();
+  public ArrayList<DataRow> toList() {
+    return this.rows.toList();
   }
 
   @SuppressWarnings("unused")
+  @JsonSerialize(using = DataRowJsonSerializer.class)
+  @JsonDeserialize(using = DataRowJsonDeserializer.class)
   public static final class DataRow implements Enumerable<Object> {
+    private static final long serialVersionUID = -8492251942206794476L;
+
     private final DataTable table;
     private final DataColumnList columns;
     private int rowNumber = -1;
-    private boolean hasNext = false;
 
     public DataRow(DataTable table) {
       this.table = table;
@@ -157,7 +183,8 @@ public final class DataTable implements Enumerable<DataTable.DataColumn> {
       checkNotWhiteSpace(columnName);
       if (this.columns.isEmpty()) throw new IllegalStateException("No columns in table");
 
-      throw new UnsupportedOperationException();
+      DataColumn column = this.columns.get(columnName);
+      column.add(value);
     }
 
     public boolean isNull(@CheckForNull String columnName) {
@@ -203,19 +230,31 @@ public final class DataTable implements Enumerable<DataTable.DataColumn> {
       checkNotNull(column);
       if (this.columns.isEmpty()) throw new IllegalStateException("No columns in table");
 
-      throw new UnsupportedOperationException();
+      return column.get(rowNumber);
     }
 
     @Override
     @Nonnull
     public <R> Enumerable<R> collect(Function<? super Object, ? extends R> function) {
-      return Sequence.it(this).map(function);
+      return Sequence.it(this).collect(function);
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     @Nonnull
     public Iterator<Object> iterator() {
-      return Sequence.it(this).iterator();
+      Iterator<DataColumn> in = this.columns.iterator();
+
+      return new AbstractIterator() {
+        @Override
+        protected @Nullable Object computeNext() {
+          while (in.hasNext()) {
+            DataColumn next = in.next();
+            return next.get(rowNumber);
+          }
+          return endOfData();
+        }
+      };
     }
 
     @Override
@@ -223,17 +262,33 @@ public final class DataTable implements Enumerable<DataTable.DataColumn> {
     public ArrayList<Object> toList() {
       return Sequence.it(this).toList();
     }
+
+    @Nonnull
+    public LinkedHashMap<String, Object> toMap() {
+      LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+
+      for (DataColumn column : this.columns) {
+        map.put(column.name(), this.getObject(column));
+      }
+      return map;
+    }
+
+    private void setPosition(int rowNumber) {
+      this.rowNumber = rowNumber;
+    }
   }
 
   @SuppressWarnings("unused")
-  public static final class DataColumn implements Enumerable<Object> {
+  public static final class DataColumn extends ArrayList<Object> implements Enumerable<Object> {
+    private static final long serialVersionUID = -8492251942206794476L;
+
     private final String name;
 
     public DataColumn(String name) {
+      checkNotWhiteSpace(name);
       this.name = name;
     }
 
-    @Nonnull
     public String name() {
       return this.name;
     }
@@ -244,59 +299,123 @@ public final class DataTable implements Enumerable<DataTable.DataColumn> {
 
     @Override
     @Nonnull
-    public Iterator<Object> iterator() {
-      return Sequence.it(this).iterator();
-    }
-
-    @Override
-    @Nonnull
     public <R> Enumerable<R> collect(Function<? super Object, ? extends R> function) {
-      return Sequence.it(this).map(function);
+      return Sequence.it(this).collect(function);
     }
 
     @Override
     @Nonnull
     public ArrayList<Object> toList() {
-      return Sequence.it(this).toList();
+      return this;
     }
   }
 
-  static final class DataColumnList extends ArrayDeque<DataColumn>
+  static final class DataColumnList extends ArrayList<DataColumn>
       implements Enumerable<DataColumn> {
     @Nonnull
-    public DataColumn get(int index) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Nonnull
-    public DataColumn get(String columnName) {
-      throw new UnsupportedOperationException();
+    public DataColumn get(@CheckForNull String columnName) {
+      checkNotWhiteSpace(columnName);
+      Optional<DataColumn> o = Sequence.it(this).single(x -> x.name.equals(columnName));
+      return o.orElseThrow(() -> new IllegalArgumentException("Column not found: " + columnName));
     }
 
     @Override
     @Nonnull
     public <R> Enumerable<R> collect(Function<? super DataColumn, ? extends R> function) {
-      return Sequence.it(this).map(function);
+      return Sequence.it(this).collect(function);
     }
 
     @Override
     @Nonnull
     public ArrayList<DataColumn> toList() {
-      return Sequence.it(this).toList();
+      return this;
     }
   }
 
-  static final class DataRowList extends ArrayDeque<DataRow> implements Enumerable<DataRow> {
+  static final class DataRowList extends ArrayList<DataRow> implements Enumerable<DataRow> {
     @Override
     @Nonnull
     public <R> Enumerable<R> collect(Function<? super DataRow, ? extends R> function) {
-      return Sequence.it(this).map(function);
+      return Sequence.it(this).collect(function);
     }
 
     @Override
     @Nonnull
     public ArrayList<DataRow> toList() {
-      return Sequence.it(this).toList();
+      return this;
+    }
+  }
+
+  static final class DataTableJsonDeserializer extends JsonDeserializer<DataTable> {
+    @Override
+    public DataTable deserialize(JsonParser p, DeserializationContext ctxt)
+        throws IOException, JacksonException {
+      JsonToken token = p.getCurrentToken();
+      if (token != JsonToken.START_ARRAY)
+        throw new IOException("Expected start of array, got: " + token);
+
+      boolean columnBeReady = false;
+      DataTable table = new DataTable();
+      while ((token = p.nextToken()) != JsonToken.END_ARRAY) {
+        if (token == JsonToken.START_OBJECT) {
+          DataRow row = table.newRow();
+          while ((token = p.nextToken()) != JsonToken.END_OBJECT) {
+            if (token == JsonToken.FIELD_NAME) {
+              String columnName = p.getCurrentName();
+              if (!columnBeReady) table.addColumn(new DataColumn(columnName));
+
+              token = p.nextToken();
+              if (token.isScalarValue()) {
+                Object value;
+                switch (token.id()) {
+                  case JsonTokenId.ID_STRING:
+                    value = p.getText();
+                    break;
+                  case JsonTokenId.ID_NUMBER_INT:
+                    value = p.getNumberValue();
+                    break;
+                  case JsonTokenId.ID_NUMBER_FLOAT:
+                    value = p.getNumberValue();
+                    break;
+                  case JsonTokenId.ID_TRUE:
+                    value = Boolean.TRUE;
+                    break;
+                  case JsonTokenId.ID_FALSE:
+                    value = Boolean.FALSE;
+                    break;
+                  default:
+                    throw new IOException("Unsupported scalar token type: " + token);
+                }
+                row.setRowData(columnName, value);
+              }
+            } else {
+              throw new IOException("Expected scalar value for field, got: " + token);
+            }
+          }
+          if (token == JsonToken.END_OBJECT) {
+            columnBeReady = true;
+            table.addRow(row);
+          }
+        }
+      }
+      return table;
+    }
+  }
+
+  static final class DataRowJsonSerializer extends JsonSerializer<DataRow> {
+    @Override
+    public void serialize(DataRow value, JsonGenerator gen, SerializerProvider serializers)
+        throws IOException {
+      LinkedHashMap<String, Object> map = value.toMap();
+      gen.writeObject(map);
+    }
+  }
+
+  static final class DataRowJsonDeserializer extends JsonDeserializer<DataRow> {
+    @Override
+    public DataRow deserialize(JsonParser p, DeserializationContext ctxt)
+        throws IOException, JacksonException {
+      throw new UnsupportedOperationException();
     }
   }
 }
