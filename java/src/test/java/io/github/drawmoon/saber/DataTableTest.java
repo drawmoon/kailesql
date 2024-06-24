@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.drawmoon.saber.DataTable.DataColumn;
 import io.github.drawmoon.saber.DataTable.DataRow;
+import io.github.drawmoon.saber.exceptions.SerializationException;
 import org.junit.jupiter.api.Test;
 
 public class DataTableTest {
@@ -66,7 +67,7 @@ public class DataTableTest {
   }
 
   @Test
-  public void serialTest() throws JsonProcessingException {
+  public void dataTableJsonSerialTest() throws JsonProcessingException {
     DataTable table = new DataTable();
     table.addColumn(new DataColumn("name"));
     table.addColumn(new DataColumn("age"));
@@ -89,14 +90,24 @@ public class DataTableTest {
   }
 
   @Test
-  public void deserialTest() throws JsonMappingException, JsonProcessingException {
+  public void dataTableJsonParseTest() throws JsonMappingException, JsonProcessingException {
     String jsonStr = "[{\"name\":\"darsh\",\"age\":18},{\"name\":\"saber\",\"age\":19}]";
 
     ObjectMapper om = new ObjectMapper();
     DataTable table = om.readValue(jsonStr, DataTable.class);
 
     assertNotNull(table);
+    assertNotNull(table.columns());
     assertEquals(2, table.rowCount());
+
+    String[] expectedColumns = new String[] {"name", "age"};
+
+    int columnIndex = 0;
+    for (DataColumn column : table.columns()) {
+      assertEquals(expectedColumns[columnIndex], column.name());
+
+      columnIndex++;
+    }
 
     Object[] expectedNameList = new Object[] {"darsh", "saber"};
     Object[] expectedAgeList = new Object[] {18, 19};
@@ -111,5 +122,29 @@ public class DataTableTest {
 
       rowIndex++;
     }
+  }
+
+  @Test
+  public void dataRowJsonSerialTest() {
+    DataTable table = new DataTable();
+    table.addColumn(new DataColumn("name"));
+    table.addColumn(new DataColumn("age"));
+
+    DataRow row = table.newRow();
+    row.setRowData("name", "darsh");
+    row.setRowData("age", 18);
+
+    ObjectMapper om = new ObjectMapper();
+    JsonMappingException jme =
+        assertThrows(JsonMappingException.class, () -> om.writeValueAsString(row));
+    assertEquals(SerializationException.class, jme.getCause().getClass());
+  }
+
+  @Test
+  public void dataRowJsonParseTest() {
+    String jsonStr = "{\"name\":\"darsh\",\"age\":18}";
+
+    ObjectMapper om = new ObjectMapper();
+    assertThrows(SerializationException.class, () -> om.readValue(jsonStr, DataRow.class));
   }
 }

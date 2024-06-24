@@ -39,7 +39,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.AbstractIterator;
 import io.github.drawmoon.saber.common.Enumerable;
 import io.github.drawmoon.saber.common.Sequence;
+import io.github.drawmoon.saber.exceptions.SerializationException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -52,8 +54,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** A DataTable is a collection of DataRows. It is a collection of rows and columns. */
 @SuppressWarnings("unused")
+@JsonSerialize(using = DataTable.DataTableJsonSerializer.class)
 @JsonDeserialize(using = DataTable.DataTableJsonDeserializer.class)
-public final class DataTable implements Enumerable<DataTable.DataRow> {
+public final class DataTable implements Enumerable<DataTable.DataRow>, Serializable {
 
   private static final long serialVersionUID = -8492251942206794476L;
 
@@ -105,6 +108,7 @@ public final class DataTable implements Enumerable<DataTable.DataRow> {
    * @throws IllegalArgumentException If the row is not from this table
    */
   public void addRow(@CheckForNull DataRow row) {
+    checkNotNull(row);
     if (row.table != this) throw new IllegalArgumentException("Row is not from this table");
 
     row.setPosition(this.rowCount);
@@ -159,7 +163,7 @@ public final class DataTable implements Enumerable<DataTable.DataRow> {
   @SuppressWarnings("unused")
   @JsonSerialize(using = DataRowJsonSerializer.class)
   @JsonDeserialize(using = DataRowJsonDeserializer.class)
-  public static final class DataRow implements Enumerable<Object> {
+  public static final class DataRow implements Enumerable<Object>, Serializable {
     private static final long serialVersionUID = -8492251942206794476L;
 
     private final DataTable table;
@@ -195,7 +199,7 @@ public final class DataTable implements Enumerable<DataTable.DataRow> {
       return this.isNull(column);
     }
 
-    public boolean isNull(@CheckForNull int columnIndex) {
+    public boolean isNull(int columnIndex) {
       checkElementIndex(columnIndex, this.columns.size());
       if (this.columns.isEmpty()) throw new IllegalStateException("No columns in table");
 
@@ -346,6 +350,18 @@ public final class DataTable implements Enumerable<DataTable.DataRow> {
     }
   }
 
+  static final class DataTableJsonSerializer extends JsonSerializer<DataTable> {
+    @Override
+    public void serialize(DataTable value, JsonGenerator gen, SerializerProvider serializers)
+        throws IOException {
+      gen.writeStartArray();
+      if (value.rowCount > 0) {
+        for (DataRow row : value) gen.writeObject(row.toMap());
+      }
+      gen.writeEndArray();
+    }
+  }
+
   static final class DataTableJsonDeserializer extends JsonDeserializer<DataTable> {
     @Override
     public DataTable deserialize(JsonParser p, DeserializationContext ctxt)
@@ -372,8 +388,6 @@ public final class DataTable implements Enumerable<DataTable.DataRow> {
                     value = p.getText();
                     break;
                   case JsonTokenId.ID_NUMBER_INT:
-                    value = p.getNumberValue();
-                    break;
                   case JsonTokenId.ID_NUMBER_FLOAT:
                     value = p.getNumberValue();
                     break;
@@ -392,10 +406,8 @@ public final class DataTable implements Enumerable<DataTable.DataRow> {
               throw new IOException("Expected scalar value for field, got: " + token);
             }
           }
-          if (token == JsonToken.END_OBJECT) {
-            columnBeReady = true;
-            table.addRow(row);
-          }
+          columnBeReady = true;
+          table.addRow(row);
         }
       }
       return table;
@@ -406,8 +418,8 @@ public final class DataTable implements Enumerable<DataTable.DataRow> {
     @Override
     public void serialize(DataRow value, JsonGenerator gen, SerializerProvider serializers)
         throws IOException {
-      LinkedHashMap<String, Object> map = value.toMap();
-      gen.writeObject(map);
+      throw new SerializationException(
+          "Separate serialization of DataRow is not supported, DataRow must be used together with DataTable.");
     }
   }
 
@@ -415,7 +427,8 @@ public final class DataTable implements Enumerable<DataTable.DataRow> {
     @Override
     public DataRow deserialize(JsonParser p, DeserializationContext ctxt)
         throws IOException, JacksonException {
-      throw new UnsupportedOperationException();
+      throw new SerializationException(
+          "Separate serialization of DataRow is not supported, DataRow must be used together with DataTable.");
     }
   }
 }
