@@ -209,9 +209,11 @@ public final class Preconditions {
     if (coll == null) throw new NullPointerException(errorMessage);
 
     LinkedList<T> list = new LinkedList<>();
+    int index = 0;
     for (T e : coll) {
-      if (e == null) throw new NullPointerException(errorMessage);
+      if (e == null) throw new NullPointerException("at " + index + ": " + errorMessage);
       list.add(e);
+      index++;
     }
 
     return list;

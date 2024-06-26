@@ -97,14 +97,14 @@ public class DataTableTest {
     DataTable table = om.readValue(jsonStr, DataTable.class);
 
     assertNotNull(table);
-    assertNotNull(table.columns());
+    assertNotNull(table.getColumns());
     assertEquals(2, table.rowCount());
 
     String[] expectedColumns = new String[] {"name", "age"};
 
     int columnIndex = 0;
-    for (DataColumn column : table.columns()) {
-      assertEquals(expectedColumns[columnIndex], column.name());
+    for (DataColumn column : table.getColumns()) {
+      assertEquals(expectedColumns[columnIndex], column.getName());
 
       columnIndex++;
     }

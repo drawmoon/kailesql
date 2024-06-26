@@ -19,15 +19,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.drawmoon.saber;
+package io.github.drawmoon.saber.impl;
 
-/** A field in a table. */
-public interface Field {
+import io.github.drawmoon.saber.Variable;
 
-    /**
-     * Returns the name of the field.
-     *
-     * @return the name of the field
-     */
-    String getName();
+/** A bind variable. */
+public class Val implements Variable<String> {
+
+  String name;
+  int inferredDataType;
 }

@@ -27,8 +27,6 @@ import javax.annotation.Nonnull;
 /** The join type. */
 public enum JoinType {
 
-  // A self join is a regular join, but the table is joined with itself.
-  SELF_JOIN("self join"),
   // The INNER JOIN keyword selects records that have matching values in both tables.
   INNER_JOIN("inner join"),
 

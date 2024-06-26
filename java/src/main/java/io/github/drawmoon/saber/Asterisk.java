@@ -21,4 +21,5 @@
  */
 package io.github.drawmoon.saber;
 
-public interface Asterisk {}
+/** A placeholder for all fields in a table. */
+public interface Asterisk extends Field {}

@@ -21,17 +21,13 @@
  */
 package io.github.drawmoon.saber.impl;
 
-import io.github.drawmoon.saber.Condition;
-import io.github.drawmoon.saber.Operator;
+import io.github.drawmoon.saber.Comparator;
+import io.github.drawmoon.saber.Expression;
 
-/**
- * The logical expression.
- *
- * <p>Combine this condition with another condition using the specified operator.
- */
-public final class Logical {
+/** A comparison expression. */
+public class ComparisonExpression {
 
-  Condition Left;
-  Condition Right;
-  Operator Operator;
+  Expression Left;
+  Comparator Operator;
+  Expression Right;
 }

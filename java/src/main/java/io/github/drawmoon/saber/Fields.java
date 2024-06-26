@@ -21,13 +21,14 @@
  */
 package io.github.drawmoon.saber;
 
-/** A field in a table. */
-public interface Field {
+import com.google.errorprone.annotations.DoNotCall;
 
-    /**
-     * Returns the name of the field.
-     *
-     * @return the name of the field
-     */
-    String getName();
+/** A set of {@link Field}. */
+public interface Fields extends Field {
+
+    @DoNotCall
+    @Override
+    default String getName() {
+        throw new UnsupportedOperationException();
+    }
 }

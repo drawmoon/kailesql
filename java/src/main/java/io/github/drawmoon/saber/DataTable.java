@@ -70,11 +70,11 @@ public final class DataTable implements Enumerable<DataTable.DataRow>, Serializa
     this.rowCount = 0;
   }
 
-  public Collection<DataColumn> columns() {
+  public Collection<DataColumn> getColumns() {
     return this.columns;
   }
 
-  public Collection<DataRow> rows() {
+  public Collection<DataRow> getRows() {
     return this.rows;
   }
 
@@ -142,20 +142,20 @@ public final class DataTable implements Enumerable<DataTable.DataRow>, Serializa
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Iterator<DataRow> iterator() {
     return this.rows.iterator();
   }
 
-  @Override
   @Nonnull
+  @Override
   public <R> Enumerable<R> collect(Function<? super DataRow, ? extends R> function) {
     return this.rows.collect(function);
   }
 
-  @Override
   @Nonnull
+  @Override
   public ArrayList<DataRow> toList() {
     return this.rows.toList();
   }
@@ -175,11 +175,11 @@ public final class DataTable implements Enumerable<DataTable.DataRow>, Serializa
       this.columns = table.columns;
     }
 
-    public DataTable table() {
+    public DataTable getTable() {
       return this.table;
     }
 
-    public Collection<DataColumn> columns() {
+    public Collection<DataColumn> getColumns() {
       return this.columns;
     }
 
@@ -237,15 +237,15 @@ public final class DataTable implements Enumerable<DataTable.DataRow>, Serializa
       return column.get(rowNumber);
     }
 
-    @Override
     @Nonnull
+    @Override
     public <R> Enumerable<R> collect(Function<? super Object, ? extends R> function) {
       return Sequence.it(this).collect(function);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    @Override
     @Nonnull
+    @Override
     public Iterator<Object> iterator() {
       Iterator<DataColumn> in = this.columns.iterator();
 
@@ -261,8 +261,8 @@ public final class DataTable implements Enumerable<DataTable.DataRow>, Serializa
       };
     }
 
-    @Override
     @Nonnull
+    @Override
     public ArrayList<Object> toList() {
       return Sequence.it(this).toList();
     }
@@ -272,7 +272,7 @@ public final class DataTable implements Enumerable<DataTable.DataRow>, Serializa
       LinkedHashMap<String, Object> map = new LinkedHashMap<>();
 
       for (DataColumn column : this.columns) {
-        map.put(column.name(), this.getObject(column));
+        map.put(column.getName(), this.getObject(column));
       }
       return map;
     }
@@ -293,7 +293,7 @@ public final class DataTable implements Enumerable<DataTable.DataRow>, Serializa
       this.name = name;
     }
 
-    public String name() {
+    public String getName() {
       return this.name;
     }
 
@@ -301,14 +301,14 @@ public final class DataTable implements Enumerable<DataTable.DataRow>, Serializa
       throw new UnsupportedOperationException();
     }
 
-    @Override
     @Nonnull
+    @Override
     public <R> Enumerable<R> collect(Function<? super Object, ? extends R> function) {
       return Sequence.it(this).collect(function);
     }
 
-    @Override
     @Nonnull
+    @Override
     public ArrayList<Object> toList() {
       return this;
     }
@@ -323,28 +323,28 @@ public final class DataTable implements Enumerable<DataTable.DataRow>, Serializa
       return o.orElseThrow(() -> new IllegalArgumentException("Column not found: " + columnName));
     }
 
-    @Override
     @Nonnull
+    @Override
     public <R> Enumerable<R> collect(Function<? super DataColumn, ? extends R> function) {
       return Sequence.it(this).collect(function);
     }
 
-    @Override
     @Nonnull
+    @Override
     public ArrayList<DataColumn> toList() {
       return this;
     }
   }
 
   static final class DataRowList extends ArrayList<DataRow> implements Enumerable<DataRow> {
-    @Override
     @Nonnull
+    @Override
     public <R> Enumerable<R> collect(Function<? super DataRow, ? extends R> function) {
       return Sequence.it(this).collect(function);
     }
 
-    @Override
     @Nonnull
+    @Override
     public ArrayList<DataRow> toList() {
       return this;
     }

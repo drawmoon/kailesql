@@ -25,13 +25,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import io.github.drawmoon.saber.Asterisk;
+import io.github.drawmoon.saber.Expression;
 import io.github.drawmoon.saber.Field;
 import io.github.drawmoon.saber.Table;
+import io.github.drawmoon.saber.common.Enumerable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.function.Function;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-/** A wrapper for a {@link Asterisk}. */
-public final class TableAsterisk implements Asterisk {
+/** A asterisk expression. */
+public class AsteriskExpression implements Asterisk, Expression {
 
   final Table table;
   final ImmutableList<Field> fields;
@@ -41,11 +46,11 @@ public final class TableAsterisk implements Asterisk {
    *
    * @param table not null
    */
-  private TableAsterisk(@CheckForNull Table table) {
+  private AsteriskExpression(@CheckForNull Table table) {
     checkNotNull(table, "table cannot be null");
 
     this.table = table;
-    this.fields = table.fields();
+    this.fields = table.getFields();
   }
 
   /**
@@ -55,7 +60,25 @@ public final class TableAsterisk implements Asterisk {
    * @return an instance of {@link Asterisk}, not null
    */
   @Nonnull
-  public static TableAsterisk of(@CheckForNull Table table) {
-    return new TableAsterisk(table);
+  public static AsteriskExpression of(@CheckForNull Table table) {
+    return new AsteriskExpression(table);
+  }
+
+  @Nonnull
+  @Override
+  public <R> Enumerable<R> collect(Function<? super Expression, ? extends R> function) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public ArrayList<Expression> toList() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public Iterator<Expression> iterator() {
+    throw new UnsupportedOperationException();
   }
 }

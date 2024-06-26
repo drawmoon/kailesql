@@ -21,149 +21,175 @@
  */
 package io.github.drawmoon.saber.impl;
 
-import static io.github.drawmoon.saber.common.Preconditions.checkNotNull;
-import static io.github.drawmoon.saber.common.Preconditions.checkNotWhiteSpace;
-import static io.github.drawmoon.saber.common.Preconditions.ensureNull;
-
 import com.google.common.collect.ImmutableList;
-import com.google.errorprone.annotations.DoNotCall;
-import io.github.drawmoon.saber.Asterisk;
-import io.github.drawmoon.saber.Condition;
-import io.github.drawmoon.saber.Field;
-import io.github.drawmoon.saber.JoinHint;
-import io.github.drawmoon.saber.JoinType;
-import io.github.drawmoon.saber.Schema;
-import io.github.drawmoon.saber.Table;
+import io.github.drawmoon.saber.*;
+import io.github.drawmoon.saber.common.Enumerable;
+import io.github.drawmoon.saber.common.Sequence;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Function;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/** A table consisting of two joined tables and possibly a join condition. */
-public final class JoinTable implements Table {
+import static com.google.common.base.Preconditions.checkNotNull;
 
-  String alias;
-  Table lhs;
-  Table rhs;
-  JoinType type;
-  JoinHint hint;
-  Condition condition;
+/**
+ * A tables expression.
+ *
+ * <p>Regularly linked tables consisting of multiple tables, use {@link JoinExpression} if you have
+ * a join type.
+ */
+public class TablesExpression implements Tables, Expression {
+
+  List<Table> tables;
   ImmutableList<Field> fields;
 
-  @Override
   @CheckForNull
-  @DoNotCall
-  public Schema schema() {
-    throw new UnsupportedOperationException();
+  @Override
+  public Schema getSchema() {
+    List<Schema> list = Sequence.it(this.tables).map(Table::getSchema).toList();
+    if (list.size() > 1) throw new IllegalStateException("More than one schema matches");
+
+    return list.get(0);
   }
 
+  @Nonnull
   @Override
-  @CheckForNull
-  public ImmutableList<Field> fields() {
-    return this.fields;
+  public List<Table> getTables() {
+    return this.tables;
   }
 
-  @Override
   @CheckForNull
-  public Field field(String f) {
-    checkNotWhiteSpace(f, "field cannot be null");
-
-    if (this.fields == null) return null;
+  @Override
+  public Table getTable(String t) {
     return null;
   }
 
+  @CheckForNull
   @Override
-  @Nonnull
-  public Table as(String alias) {
-    ensureNull(this.alias);
-    checkNotWhiteSpace(alias, "alias cannot be null");
+  public ImmutableList<Field> getFields() {
+    return this.fields;
+  }
 
-    this.alias = alias;
+  @CheckForNull
+  @Override
+  public Field getField(String f) {
+    List<Field> list = Sequence.it(this.fields).filter(t -> f.equals(t.getName())).toList();
+    if (list.isEmpty()) return null;
+
+    if (list.size() == 1) return list.get(0);
+    else throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public Tables append(@CheckForNull Table t) {
+    checkNotNull(t);
+
+    if (t instanceof Tables) {
+      throw new UnsupportedOperationException();
+    }
+    this.tables.add(t);
     return this;
   }
 
-  @Override
   @Nonnull
-  public Asterisk asterisk() {
-    return TableAsterisk.of(this);
+  @Override
+  public Tables insert(int index, @CheckForNull Table t) {
+    return null;
   }
 
-  @Override
   @Nonnull
-  public JoinTable Join(Table t, JoinType jt, @Nullable JoinHint jh) {
-    checkNotNull(t, jt);
-
-    throw new UnsupportedOperationException();
-  }
-
   @Override
-  @Nonnull
   public Table useIndex(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table useIndexForJoin(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table useIndexForOrderBy(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table useIndexForGroupBy(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table ignoreIndex(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table ignoreIndexForJoin(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table ignoreIndexForOrderBy(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table ignoreIndexForGroupBy(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table forceIndex(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table forceIndexForJoin(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table forceIndexForOrderBy(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table forceIndexForGroupBy(String... i) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public <R> Enumerable<R> collect(Function<? super Expression, ? extends R> function) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public ArrayList<Expression> toList() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public Iterator<Expression> iterator() {
     throw new UnsupportedOperationException();
   }
 }

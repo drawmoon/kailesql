@@ -19,15 +19,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.drawmoon.saber;
+package io.github.drawmoon.saber.impl;
 
-/** A field in a table. */
-public interface Field {
+import io.github.drawmoon.saber.Condition;
+import io.github.drawmoon.saber.Operator;
 
-    /**
-     * Returns the name of the field.
-     *
-     * @return the name of the field
-     */
-    String getName();
+/**
+ * A logical expression.
+ *
+ * <p>Combine this condition with another condition using the specified operator.
+ */
+public final class LogicalExpression {
+
+  Condition Left;
+  Condition Right;
+  Operator Operator;
 }

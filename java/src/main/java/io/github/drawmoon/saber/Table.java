@@ -22,7 +22,7 @@
 package io.github.drawmoon.saber;
 
 import com.google.common.collect.ImmutableList;
-import io.github.drawmoon.saber.impl.JoinTable;
+import io.github.drawmoon.saber.impl.JoinExpression;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,7 +37,7 @@ public interface Table {
    * @return returns the schema, not null
    */
   @CheckForNull
-  Schema schema();
+  Schema getSchema();
 
   /**
    * Gets the fields of this table.
@@ -45,7 +45,7 @@ public interface Table {
    * @return returns the fields, not null
    */
   @CheckForNull
-  ImmutableList<Field> fields();
+  ImmutableList<Field> getFields();
 
   /**
    * Gets a field from this table.
@@ -54,7 +54,7 @@ public interface Table {
    * @return returns the field, not null
    */
   @CheckForNull
-  Field field(String f);
+  Field getField(String f);
 
   /**
    * Sets the alias for the table.
@@ -82,7 +82,7 @@ public interface Table {
    * @return returns the join table, not null
    */
   @Nonnull
-  JoinTable Join(Table t, JoinType jt, @Nullable JoinHint jh);
+  Table join(Table t, JoinType jt, @Nullable JoinHint jh);
 
   // -----------------------------------------------------------------------
   /**

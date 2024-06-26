@@ -26,18 +26,17 @@ import static io.github.drawmoon.saber.common.Preconditions.checkNotWhiteSpace;
 import static io.github.drawmoon.saber.common.Preconditions.ensureNull;
 
 import com.google.common.collect.ImmutableList;
-import io.github.drawmoon.saber.Asterisk;
-import io.github.drawmoon.saber.Field;
-import io.github.drawmoon.saber.JoinHint;
-import io.github.drawmoon.saber.JoinType;
-import io.github.drawmoon.saber.Schema;
-import io.github.drawmoon.saber.Table;
+import io.github.drawmoon.saber.*;
+import io.github.drawmoon.saber.common.Enumerable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.function.Function;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/** A base table. */
-public final class BaseTable implements Table {
+/** A table expression. */
+public final class TableExpression implements Table, Expression {
 
   String name;
   String alias;
@@ -46,27 +45,27 @@ public final class BaseTable implements Table {
 
   @Override
   @CheckForNull
-  public Schema schema() {
+  public Schema getSchema() {
     return this.schema;
   }
 
   @Override
   @CheckForNull
-  public ImmutableList<Field> fields() {
+  public ImmutableList<Field> getFields() {
     return this.fields;
   }
 
   @Override
   @CheckForNull
-  public Field field(String f) {
+  public Field getField(String f) {
     checkNotWhiteSpace(f, "field cannot be null");
 
     if (this.fields == null) return null;
     return null;
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table as(String alias) {
     ensureNull(this.alias);
     checkNotWhiteSpace(alias, "alias cannot be null");
@@ -75,89 +74,107 @@ public final class BaseTable implements Table {
     return this;
   }
 
-  @Override
   @Nonnull
+  @Override
   public Asterisk asterisk() {
-    return TableAsterisk.of(this);
+    return AsteriskExpression.of(this);
   }
 
-  @Override
   @Nonnull
-  public JoinTable Join(Table t, JoinType jt, @Nullable JoinHint jh) {
+  @Override
+  public JoinExpression join(Table t, JoinType jt, @Nullable JoinHint jh) {
     checkNotNull(t, jt);
 
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table useIndex(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table useIndexForJoin(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table useIndexForOrderBy(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table useIndexForGroupBy(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table ignoreIndex(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table ignoreIndexForJoin(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table ignoreIndexForOrderBy(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table ignoreIndexForGroupBy(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table forceIndex(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table forceIndexForJoin(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table forceIndexForOrderBy(String... i) {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   @Nonnull
+  @Override
   public Table forceIndexForGroupBy(String... i) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public <R> Enumerable<R> collect(Function<? super Expression, ? extends R> function) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public ArrayList<Expression> toList() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public Iterator<Expression> iterator() {
     throw new UnsupportedOperationException();
   }
 }
