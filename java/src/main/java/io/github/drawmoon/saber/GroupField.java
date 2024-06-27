@@ -22,4 +22,4 @@
 package io.github.drawmoon.saber;
 
 /** A field that can be used to group a query. */
-public interface GroupField extends Field {}
+public interface GroupField extends TableField {}

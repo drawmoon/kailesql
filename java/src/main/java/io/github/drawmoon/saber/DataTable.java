@@ -133,11 +133,13 @@ public final class DataTable implements Enumerable<DataTable.DataRow>, Serializa
    * @param length The length of the slice
    * @return the new DataTable
    */
+  @SuppressWarnings("DoNotCallSuggester")
   public DataTable slice(int index, int length) {
     throw new UnsupportedOperationException();
   }
 
   /** Prints the DataTable as a table. */
+  @SuppressWarnings("DoNotCallSuggester")
   public void printAsTable() {
     throw new UnsupportedOperationException();
   }
@@ -297,6 +299,7 @@ public final class DataTable implements Enumerable<DataTable.DataRow>, Serializa
       return this.name;
     }
 
+    @SuppressWarnings("DoNotCallSuggester")
     public boolean isNullable() {
       throw new UnsupportedOperationException();
     }

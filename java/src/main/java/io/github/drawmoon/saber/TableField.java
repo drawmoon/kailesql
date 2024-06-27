@@ -21,33 +21,32 @@
  */
 package io.github.drawmoon.saber;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-/** An operator used for combining conditions. */
-public enum Operator {
-  AND("and"),
-  OR("or");
-
-  private final String keyword;
+/** A field in a table. */
+public interface TableField extends Field {
 
   /**
-   * Constructor.
+   * Returns the alias of the table.
    *
-   * @param keyword the keyword, not null
+   * @return the alias of the table
    */
-  private Operator(String keyword) {
-    this.keyword = keyword;
-  }
+  String getAlias();
 
   /**
-   * Accept a {@link SqlGenerator} object in order to render a SQL string or to bind its variables.
+   * Get the table that this field belongs to.
    *
-   * @param gen The {@link SqlGenerator} object to accept, not null
-   * @return The rendered SQL string, not null
+   * @return the table
    */
   @Nonnull
-  public String accept(@CheckForNull SqlGenerator gen) {
-    return Keyword.keyword(this.keyword).accept(gen);
-  }
+  Table getTable();
+
+  /**
+   * Sets the alias for the field.
+   *
+   * @param alias the alias, not null
+   * @return returns the field, not null
+   */
+  @Nonnull
+  TableField as(String alias);
 }

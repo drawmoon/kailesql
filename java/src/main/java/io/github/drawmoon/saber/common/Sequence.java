@@ -26,16 +26,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.AbstractIterator;
 import com.google.errorprone.annotations.ForOverride;
 import java.io.Serializable;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
@@ -44,12 +38,13 @@ import javax.annotation.Nonnull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Utility methods pertaining to Collection instances. */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "DoNotCallSuggester"})
 public final class Sequence<T> implements Enumerable<T>, Serializable {
 
   private static final long serialVersionUID = -8492251942206794476L;
 
   private final Iterable<T> iter;
+  private final boolean parallel;
 
   /**
    * Constructs.
@@ -57,7 +52,62 @@ public final class Sequence<T> implements Enumerable<T>, Serializable {
    * @param iter the iterator
    */
   private Sequence(@CheckForNull Iterable<T> iter) {
+    this(iter, false);
+  }
+
+  /**
+   * Constructs.
+   *
+   * @param iter the iterator
+   * @param parallel whether to use parallel
+   */
+  private Sequence(@CheckForNull Iterable<T> iter, boolean parallel) {
     this.iter = checkNotNull(iter);
+    this.parallel = parallel;
+  }
+
+  /**
+   * Returns an empty Sequence.
+   *
+   * @param <T> the type of elements in the list
+   * @return the new sequence
+   */
+  public static <T> Sequence<T> empty() {
+    return it(
+        new Iterator<T>() {
+          @Override
+          public boolean hasNext() {
+            return false;
+          }
+
+          @Override
+          public T next() {
+            throw new NoSuchElementException();
+          }
+        });
+  }
+
+  /**
+   * Returns a sequential ordered Sequence from start (inclusive) to end (inclusive) by an
+   * incremental step of 1.
+   *
+   * @param start the (inclusive) initial value
+   * @param end the inclusive upper bound
+   * @return the new sequence
+   */
+  public static Sequence<Integer> range(int start, int end) {
+    return it(new RangeIntTransform(start, end));
+  }
+
+  /**
+   * Creates a Sequence from a list of elements.
+   *
+   * @param <T> the type of elements in the list
+   * @param iter the elements
+   * @return the new sequence
+   */
+  public static <T> Sequence<T> it(Iterator<T> iter) {
+    return it(() -> iter);
   }
 
   /**
@@ -72,15 +122,12 @@ public final class Sequence<T> implements Enumerable<T>, Serializable {
   }
 
   /**
-   * Returns a sequential ordered Sequence from start (inclusive) to end (inclusive) by an
-   * incremental step of 1.
+   * Returns a parallel Sequence.
    *
-   * @param start the (inclusive) initial value
-   * @param end the inclusive upper bound
    * @return the new sequence
    */
-  public static Sequence<Integer> range(int start, int end) {
-    return it(new Sequence<>(new RangeIntTransform(start, end)));
+  public Sequence<T> asParallel() {
+    return new Sequence<>(this.iter, true);
   }
 
   /**
@@ -245,32 +292,6 @@ public final class Sequence<T> implements Enumerable<T>, Serializable {
   }
 
   /**
-   * Returns a Sequence containing the results of applying the given mapper function to each element
-   * in the original Sequence.
-   *
-   * <p>Example usages:
-   *
-   * <pre>{@code
-   * Employee e1 = new Employee("John", 30);
-   * Employee e2 = new Employee("Jane", 25);
-   *
-   * List<Employee> list = Arrays.asList(e1, e2);
-   * Sequence<String> seq = Sequence.it(list).parallelMap(Employee::getName);
-   * }</pre>
-   *
-   * <p>Example output:
-   *
-   * <pre>{@code ["John", "Jane"]}</pre>
-   *
-   * @param <R> the type of the elements in the resulting Sequence
-   * @param mapper the function to apply to each element
-   * @return the new Sequence
-   */
-  public <R> Sequence<R> parallelMap(Function<? super T, ? extends R> mapper) {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
    * Returns a single list of all elements yielded from results of function being invoked on each
    * element of original collection.
    *
@@ -315,7 +336,7 @@ public final class Sequence<T> implements Enumerable<T>, Serializable {
    * @return returns the {@link Optional} instance
    */
   public Optional<T> find(Predicate<? super T> predicate) {
-    throw new UnsupportedOperationException();
+    return Optional.of(this.filter(predicate).first());
   }
 
   /**
@@ -389,7 +410,12 @@ public final class Sequence<T> implements Enumerable<T>, Serializable {
    * @throws NullPointerException if Sequence is empty or the selected element is null
    */
   public T first() {
-    throw new UnsupportedOperationException();
+    if (!this.hasNext()) throw new NullPointerException("Sequence is empty");
+
+    T t = this.iterator().next();
+    if (t == null) throw new NullPointerException("Sequence is empty");
+
+    return t;
   }
 
   /**
@@ -734,8 +760,8 @@ public final class Sequence<T> implements Enumerable<T>, Serializable {
    *
    * @param index index of the element to return
    * @return the element at the specified position in this Sequence
-   * @throws IndexOutOfBoundsException if the index is out of range <code>
-   *     (index < 0 || index >= size())</code>
+   * @throws IndexOutOfBoundsException if the index is out of range {@code (index < 0 || index >=
+   *     size())}
    */
   public T elementAt(int index) {
     throw new UnsupportedOperationException();
@@ -759,8 +785,8 @@ public final class Sequence<T> implements Enumerable<T>, Serializable {
    * @param index index of the element to return
    * @param defaultValue the default value to return if the index is out of bounds
    * @return the element at the specified position in this Sequence
-   * @throws IndexOutOfBoundsException if the index is out of range <code>
-   *     (index < 0 || index >= size())</code>
+   * @throws IndexOutOfBoundsException if the index is out of range {@code (index < 0 || index >=
+   *     size())}
    */
   public T elementAtOrElse(int index, T defaultValue) {
     throw new UnsupportedOperationException();
@@ -784,8 +810,8 @@ public final class Sequence<T> implements Enumerable<T>, Serializable {
    * @param index index of the element to return
    * @param function the callable function
    * @return the element at the specified position in this Sequence
-   * @throws IndexOutOfBoundsException if the index is out of range <code>
-   *     (index < 0 || index >= size())</code>
+   * @throws IndexOutOfBoundsException if the index is out of range {@code (index < 0 || index >=
+   *     size())}
    */
   public T elementAtOrElse(int index, Function<? super T, ? extends T> function) {
     throw new UnsupportedOperationException();
@@ -878,58 +904,6 @@ public final class Sequence<T> implements Enumerable<T>, Serializable {
    * @param action The action to be performed for each element
    */
   public void forEach(BiConsumer<Integer, ? super T> action) {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Invokes action function on each element of the given Sequence in parallel.
-   *
-   * <p>Example usages:
-   *
-   * <pre>{@code
-   * List<String> list = Arrays.asList("a", "b", "c");
-   * Sequence.it(list).parallelForEach(x -> {
-   *   System.out.println(x);
-   * });
-   * }</pre>
-   *
-   * <p>Example output:
-   *
-   * <pre>{@code
-   * a
-   * b
-   * c
-   * }</pre>
-   *
-   * @param action a non-interfering action to perform on the elements
-   */
-  public void parallelForEach(Consumer<? super T> action) {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Invokes action function on each element of the given Sequence in parallel.
-   *
-   * <p>Example usages:
-   *
-   * <pre>{@code
-   * List<String> list = Arrays.asList("a", "b", "c");
-   * Sequence.it(list).parallelForEach((i, x) -> {
-   *   System.out.println(i + " " + x);
-   * });
-   * }</pre>
-   *
-   * <p>Example output:
-   *
-   * <pre>{@code
-   * 0 a
-   * 1 b
-   * 2 c
-   * }</pre>
-   *
-   * @param action a non-interfering action to perform on the elements
-   */
-  public void parallelForEach(BiConsumer<Integer, ? super T> action) {
     throw new UnsupportedOperationException();
   }
 
@@ -1112,7 +1086,7 @@ public final class Sequence<T> implements Enumerable<T>, Serializable {
    * @return the number
    */
   public long size() {
-    return StreamSupport.stream(iter.spliterator(), false).count();
+    return StreamSupport.stream(iter.spliterator(), this.parallel).count();
   }
 
   /**
@@ -1142,13 +1116,17 @@ public final class Sequence<T> implements Enumerable<T>, Serializable {
   @Nonnull
   @Override
   public <R> Enumerable<R> collect(Function<? super T, ? extends R> function) {
-    throw new UnsupportedOperationException();
+    return this.map(function);
   }
 
   @Nonnull
   @Override
   public Iterator<T> iterator() {
     return iter.iterator();
+  }
+
+  private boolean hasNext() {
+    return this.iterator().hasNext();
   }
 
   public static final class Grouping<K, V> implements Enumerable<V> {
@@ -1233,7 +1211,7 @@ public final class Sequence<T> implements Enumerable<T>, Serializable {
     private final int upTo;
 
     public RangeIntTransform(int from, int upTo) {
-      this.from = from;
+      this.from = from - 1;
       this.upTo = upTo;
     }
 

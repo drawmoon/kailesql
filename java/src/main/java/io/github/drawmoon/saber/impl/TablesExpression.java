@@ -21,21 +21,16 @@
  */
 package io.github.drawmoon.saber.impl;
 
+import static com.google.common.base.Preconditions.*;
+
 import com.google.common.collect.ImmutableList;
 import io.github.drawmoon.saber.*;
-import io.github.drawmoon.saber.common.Enumerable;
 import io.github.drawmoon.saber.common.Sequence;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Consumer;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A tables expression.
@@ -43,10 +38,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>Regularly linked tables consisting of multiple tables, use {@link JoinExpression} if you have
  * a join type.
  */
+@SuppressWarnings("unused")
 public class TablesExpression implements Tables, Expression {
 
   List<Table> tables;
-  ImmutableList<Field> fields;
+  ImmutableList<TableField> fields;
 
   @CheckForNull
   @Override
@@ -57,10 +53,14 @@ public class TablesExpression implements Tables, Expression {
     return list.get(0);
   }
 
-  @Nonnull
   @Override
-  public List<Table> getTables() {
-    return this.tables;
+  public String getName() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public String getAlias() {
+    throw new UnsupportedOperationException();
   }
 
   @CheckForNull
@@ -71,18 +71,21 @@ public class TablesExpression implements Tables, Expression {
 
   @CheckForNull
   @Override
-  public ImmutableList<Field> getFields() {
+  public List<TableField> getFields() {
     return this.fields;
   }
 
   @CheckForNull
   @Override
-  public Field getField(String f) {
-    List<Field> list = Sequence.it(this.fields).filter(t -> f.equals(t.getName())).toList();
+  public TableField getField(String f) {
+    List<TableField> list = Sequence.it(this.fields).filter(t -> f.equals(t.getName())).toList();
     if (list.isEmpty()) return null;
 
-    if (list.size() == 1) return list.get(0);
-    else throw new UnsupportedOperationException();
+    if (list.size() == 1) {
+      return list.get(0);
+    } else {
+      throw new UnsupportedOperationException();
+    }
   }
 
   @Nonnull
@@ -91,18 +94,37 @@ public class TablesExpression implements Tables, Expression {
     checkNotNull(t);
 
     if (t instanceof Tables) {
-      throw new UnsupportedOperationException();
+      Tables ts = (Tables) t;
+      ts.forEachTable(this::append);
+    } else {
+      this.tables.add(t);
     }
-    this.tables.add(t);
     return this;
   }
 
   @Nonnull
   @Override
   public Tables insert(int index, @CheckForNull Table t) {
-    return null;
+    checkNotNull(t);
+    checkElementIndex(index, this.tables.size());
+
+    if (t instanceof Tables) {
+      Tables ts = (Tables) t;
+      ts.forEachTable(e -> this.insert(index, e));
+    } else {
+      this.tables.add(index, t);
+    }
+    return this;
   }
 
+  @Override
+  public void forEachTable(Consumer<Table> action) {
+    checkNotNull(action);
+
+    for (Table t : this.tables) action.accept(t);
+  }
+
+  // -----------------------------------------------------------------------
   @Nonnull
   @Override
   public Table useIndex(String... i) {
@@ -175,21 +197,10 @@ public class TablesExpression implements Tables, Expression {
     throw new UnsupportedOperationException();
   }
 
-  @Nonnull
-  @Override
-  public <R> Enumerable<R> collect(Function<? super Expression, ? extends R> function) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Nonnull
-  @Override
-  public ArrayList<Expression> toList() {
-    throw new UnsupportedOperationException();
-  }
-
+  // -----------------------------------------------------------------------
   @Nonnull
   @Override
   public Iterator<Expression> iterator() {
-    throw new UnsupportedOperationException();
+    return ExpressionIterator.sameAsExpression(this.tables.toArray());
   }
 }

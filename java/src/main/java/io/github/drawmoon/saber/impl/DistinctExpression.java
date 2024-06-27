@@ -22,17 +22,23 @@
 package io.github.drawmoon.saber.impl;
 
 import io.github.drawmoon.saber.Expression;
+import io.github.drawmoon.saber.ExpressionIterator;
 import io.github.drawmoon.saber.Field;
 import io.github.drawmoon.saber.common.Enumerable;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 
 /** A distinct expression. */
+@SuppressWarnings("unused")
 public class DistinctExpression implements Field, Expression {
 
   Field field;
+
+  @Override
+  public String getName() {
+    return this.field.getName();
+  }
 
   @Nonnull
   @Override
@@ -42,13 +48,7 @@ public class DistinctExpression implements Field, Expression {
 
   @Nonnull
   @Override
-  public ArrayList<Expression> toList() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Nonnull
-  @Override
   public Iterator<Expression> iterator() {
-    throw new UnsupportedOperationException();
+    return ExpressionIterator.sameAsExpression(this.field);
   }
 }

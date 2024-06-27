@@ -21,39 +21,46 @@
  */
 package io.github.drawmoon.saber.impl;
 
-import io.github.drawmoon.saber.Condition;
 import io.github.drawmoon.saber.Expression;
 import io.github.drawmoon.saber.ExpressionIterator;
-import io.github.drawmoon.saber.Operator;
+import io.github.drawmoon.saber.Table;
+import io.github.drawmoon.saber.TableField;
 import java.util.Iterator;
 import javax.annotation.Nonnull;
 
-/**
- * A logical expression.
- *
- * <p>Combine this condition with another condition using the specified operator.
- */
-public class LogicalExpression implements Condition {
+/** A table field expression. */
+public class TableFieldExpression implements TableField, Expression {
 
-  Condition left;
-  Condition right;
-  Operator operator;
+  String name;
+  String alias;
+  Table table;
 
-  @Nonnull
   @Override
-  public Condition and(Expression expr) {
-    throw new UnsupportedOperationException();
+  public String getName() {
+    return this.name;
+  }
+
+  @Override
+  public String getAlias() {
+    return this.alias;
   }
 
   @Nonnull
   @Override
-  public Condition or(Expression expr) {
-    throw new UnsupportedOperationException();
+  public Table getTable() {
+    return this.table;
+  }
+
+  @Nonnull
+  @Override
+  public TableField as(String alias) {
+    this.alias = alias;
+    return this;
   }
 
   @Nonnull
   @Override
   public Iterator<Expression> iterator() {
-    return ExpressionIterator.sameAsExpression(this.left, this.right);
+    return ExpressionIterator.empty();
   }
 }

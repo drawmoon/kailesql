@@ -21,14 +21,56 @@
  */
 package io.github.drawmoon.saber;
 
-import com.google.errorprone.annotations.DoNotCall;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.util.function.Consumer;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 /** A set of {@link Field}. */
+@SuppressWarnings("unused")
 public interface Fields extends Field {
 
-    @DoNotCall
-    @Override
-    default String getName() {
-        throw new UnsupportedOperationException();
-    }
+  /**
+   * Gets a field from this set.
+   *
+   * @param f the field name, not null
+   * @return returns the field
+   */
+  @CheckForNull
+  Field getField(String f);
+
+  /**
+   * Appends the table.
+   *
+   * @param f the field, not null
+   * @return the new fields, not null
+   */
+  @CanIgnoreReturnValue
+  @Nonnull
+  Fields append(@CheckForNull Field f);
+
+  /**
+   * Inserts the table.
+   *
+   * @param index the index
+   * @param f the field, not null
+   * @throws IndexOutOfBoundsException if index is negative or greater than {@code size()}, or
+   *     offset or len are negative
+   * @return the new fields, not null
+   */
+  @CanIgnoreReturnValue
+  @Nonnull
+  Fields insert(int index, @CheckForNull Field f);
+
+  /**
+   * Perform the given action for each {@link Field} until all elements have been processed.
+   *
+   * @param action the action
+   */
+  void forEachField(Consumer<Field> action);
+
+  @Override
+  default String getName() {
+    throw new UnsupportedOperationException();
+  }
 }

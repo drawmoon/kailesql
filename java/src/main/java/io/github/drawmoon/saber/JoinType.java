@@ -25,6 +25,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 /** The join type. */
+@SuppressWarnings("unused")
 public enum JoinType {
 
   // The INNER JOIN keyword selects records that have matching values in both tables.
@@ -47,15 +48,15 @@ public enum JoinType {
   FULL_JOIN("full join"),
   FULL_OUTER_JOIN("full outer join");
 
-  private final Keyword keyword;
+  private final String keyword;
 
   /**
    * Constructor.
    *
    * @param keyword the keyword, not null
    */
-  private JoinType(String keyword) {
-    this.keyword = Keyword.keyword(keyword);
+  JoinType(String keyword) {
+    this.keyword = keyword;
   }
 
   /**
@@ -66,6 +67,6 @@ public enum JoinType {
    */
   @Nonnull
   public String accept(@CheckForNull SqlGenerator gen) {
-    return this.keyword.accept(gen);
+    return Keyword.keyword(this.keyword).accept(gen);
   }
 }

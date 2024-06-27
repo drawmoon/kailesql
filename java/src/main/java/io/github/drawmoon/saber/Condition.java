@@ -21,6 +21,8 @@
  */
 package io.github.drawmoon.saber;
 
+import javax.annotation.Nonnull;
+
 /**
  * A condition or predicate.
  *
@@ -36,6 +38,7 @@ public interface Condition extends Expression {
    * @param expr The expression to be logically ANDed with this Condition.
    * @return return a new Condition representing the logical AND operation.
    */
+  @Nonnull
   Condition and(Expression expr);
 
   /**
@@ -44,5 +47,6 @@ public interface Condition extends Expression {
    * @param expr The expression to be logically ORed with this Condition.
    * @return return a new Condition representing the logical OR operation.
    */
+  @Nonnull
   Condition or(Expression expr);
 }

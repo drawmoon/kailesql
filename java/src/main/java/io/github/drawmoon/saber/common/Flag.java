@@ -23,11 +23,7 @@ package io.github.drawmoon.saber.common;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
@@ -105,13 +101,12 @@ public interface Flag {
      * @return the flags, not null
      */
     @Nonnull
-    public static <E extends Enum<E> & Flag> LinkedList<E> flags(
-        int value, @CheckForNull Class<E> c) {
+    public static <E extends Enum<E> & Flag> List<E> flags(int value, @CheckForNull Class<E> c) {
       checkNotNull(c);
 
       LinkedHashMap<Integer, E> map = maps(c);
 
-      LinkedList<E> flags = new LinkedList<>();
+      List<E> flags = new ArrayList<>();
       if (map.containsKey(value)) {
         flags.add(map.get(value));
         return flags;

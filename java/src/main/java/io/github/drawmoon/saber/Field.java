@@ -21,13 +21,13 @@
  */
 package io.github.drawmoon.saber;
 
-/** A field in a table. */
+/** A field. */
 public interface Field {
 
-    /**
-     * Returns the name of the field.
-     *
-     * @return the name of the field
-     */
-    String getName();
+  /**
+   * Returns the name of the field.
+   *
+   * @return the name of the field
+   */
+  String getName();
 }

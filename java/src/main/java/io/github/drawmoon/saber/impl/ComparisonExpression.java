@@ -22,12 +22,34 @@
 package io.github.drawmoon.saber.impl;
 
 import io.github.drawmoon.saber.Comparator;
+import io.github.drawmoon.saber.Condition;
 import io.github.drawmoon.saber.Expression;
+import io.github.drawmoon.saber.ExpressionIterator;
+import java.util.Iterator;
+import javax.annotation.Nonnull;
 
 /** A comparison expression. */
-public class ComparisonExpression {
+public class ComparisonExpression implements Condition {
 
-  Expression Left;
-  Comparator Operator;
-  Expression Right;
+  Expression left;
+  Comparator operator;
+  Expression right;
+
+  @Nonnull
+  @Override
+  public Condition and(Expression expr) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public Condition or(Expression expr) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public Iterator<Expression> iterator() {
+    return ExpressionIterator.sameAsExpression(this.left, this.right);
+  }
 }

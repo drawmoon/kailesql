@@ -21,8 +21,9 @@
  */
 package io.github.drawmoon.saber.common;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.annotation.CheckForNull;
@@ -138,19 +139,20 @@ public final class Preconditions {
    * @param errorMessage the exception message to use if the check fails
    */
   public static void checkNotWhiteSpace(CharSequence text, String errorMessage) {
-    if (text == null) throw new NullPointerException();
+    if (text == null) throw new NullPointerException(errorMessage);
 
-    boolean hasNotNullElement = false;
+    boolean foundNonWhitespace = false;
     for (int i = 0; i < text.length(); i++) {
       try {
         checkNotWhiteSpace(text.charAt(i));
-        hasNotNullElement = true;
+        foundNonWhitespace = true;
         break;
-      } catch (NullPointerException e) {
+      } catch (NullPointerException expected) {
+        // expected, just continue
       }
     }
 
-    if (!hasNotNullElement) throw new NullPointerException();
+    if (!foundNonWhitespace) throw new NullPointerException();
   }
 
   /**
@@ -191,7 +193,7 @@ public final class Preconditions {
    * @return the cleaned collection
    */
   @Nonnull
-  public static <T> LinkedList<T> collectionNullClean(Collection<? extends T> coll) {
+  public static <T> List<T> collectionNullClean(Collection<? extends T> coll) {
     return collectionNullClean(coll, null);
   }
 
@@ -204,11 +206,11 @@ public final class Preconditions {
    * @return the cleaned collection
    */
   @Nonnull
-  public static <T> LinkedList<T> collectionNullClean(
+  public static <T> ArrayList<T> collectionNullClean(
       Collection<? extends T> coll, String errorMessage) {
     if (coll == null) throw new NullPointerException(errorMessage);
 
-    LinkedList<T> list = new LinkedList<>();
+    ArrayList<T> list = new ArrayList<>();
     int index = 0;
     for (T e : coll) {
       if (e == null) throw new NullPointerException("at " + index + ": " + errorMessage);

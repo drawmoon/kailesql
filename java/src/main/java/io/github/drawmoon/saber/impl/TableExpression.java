@@ -25,12 +25,10 @@ import static io.github.drawmoon.saber.common.Preconditions.checkNotNull;
 import static io.github.drawmoon.saber.common.Preconditions.checkNotWhiteSpace;
 import static io.github.drawmoon.saber.common.Preconditions.ensureNull;
 
-import com.google.common.collect.ImmutableList;
 import io.github.drawmoon.saber.*;
-import io.github.drawmoon.saber.common.Enumerable;
-import java.util.ArrayList;
+import io.github.drawmoon.saber.common.Sequence;
 import java.util.Iterator;
-import java.util.function.Function;
+import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,7 +39,7 @@ public final class TableExpression implements Table, Expression {
   String name;
   String alias;
   Schema schema;
-  ImmutableList<Field> fields;
+  List<TableField> fields;
 
   @Override
   @CheckForNull
@@ -50,18 +48,28 @@ public final class TableExpression implements Table, Expression {
   }
 
   @Override
+  public String getName() {
+    return this.name;
+  }
+
+  @Override
+  public String getAlias() {
+    return this.alias;
+  }
+
+  @Override
   @CheckForNull
-  public ImmutableList<Field> getFields() {
+  public List<TableField> getFields() {
     return this.fields;
   }
 
   @Override
   @CheckForNull
-  public Field getField(String f) {
+  public TableField getField(String f) {
     checkNotWhiteSpace(f, "field cannot be null");
 
     if (this.fields == null) return null;
-    return null;
+    return Sequence.it(this.fields).find(x -> f.equals(x.getName())).orElse(null);
   }
 
   @Nonnull
@@ -88,6 +96,7 @@ public final class TableExpression implements Table, Expression {
     throw new UnsupportedOperationException();
   }
 
+  // -----------------------------------------------------------------------
   @Nonnull
   @Override
   public Table useIndex(String... i) {
@@ -160,21 +169,10 @@ public final class TableExpression implements Table, Expression {
     throw new UnsupportedOperationException();
   }
 
-  @Nonnull
-  @Override
-  public <R> Enumerable<R> collect(Function<? super Expression, ? extends R> function) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Nonnull
-  @Override
-  public ArrayList<Expression> toList() {
-    throw new UnsupportedOperationException();
-  }
-
+  // -----------------------------------------------------------------------
   @Nonnull
   @Override
   public Iterator<Expression> iterator() {
-    throw new UnsupportedOperationException();
+    return ExpressionIterator.sameAsExpression(this.fields.toArray());
   }
 }

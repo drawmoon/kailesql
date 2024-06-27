@@ -21,8 +21,7 @@
  */
 package io.github.drawmoon.saber;
 
-import com.google.common.collect.ImmutableList;
-import io.github.drawmoon.saber.impl.JoinExpression;
+import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -40,12 +39,26 @@ public interface Table {
   Schema getSchema();
 
   /**
+   * Returns the name of the table.
+   *
+   * @return the name of the table
+   */
+  String getName();
+
+  /**
+   * Returns the alias of the table.
+   *
+   * @return the alias of the table
+   */
+  String getAlias();
+
+  /**
    * Gets the fields of this table.
    *
    * @return returns the fields, not null
    */
   @CheckForNull
-  ImmutableList<Field> getFields();
+  List<TableField> getFields();
 
   /**
    * Gets a field from this table.
@@ -54,7 +67,7 @@ public interface Table {
    * @return returns the field, not null
    */
   @CheckForNull
-  Field getField(String f);
+  TableField getField(String f);
 
   /**
    * Sets the alias for the table.

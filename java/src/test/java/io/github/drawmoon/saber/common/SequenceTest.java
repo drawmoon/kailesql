@@ -26,26 +26,45 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayDeque;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 
 public class SequenceTest {
 
   public void itTest() {}
 
-  public void rangeTest() {}
+  @Test
+  public void emptyTest() {
+    Sequence<Object> seq = Sequence.empty();
+    assertThat(seq.size(), is(equalTo(0L)));
+
+    List<Object> list = seq.toList();
+    assertThat(list.size(), is(equalTo(0)));
+  }
+
+  @Test
+  public void rangeTest() {
+    List<Integer> list = Sequence.range(1, 10).toList();
+    assertThat(list, is(equalTo(ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))));
+
+    // test is consistent with the results of Stream.range
+    List<Integer> streamNumList = IntStream.rangeClosed(1, 10).boxed().collect(Collectors.toList());
+    assertThat(list, is(equalTo(streamNumList)));
+  }
 
   @Test
   public void filterTest() {
-    Sequence<Integer> list = Sequence.range(1, 10);
-    ArrayDeque<Integer> arrayList = Sequence.it(list).filter(i -> i % 2 == 0).toDequeList();
-    assertThat(arrayList.toArray(), is(equalTo(ImmutableList.of(2, 4, 6, 8, 10).toArray())));
+    Sequence<Integer> seq = Sequence.range(1, 10);
+    List<Integer> list = Sequence.it(seq).filter(i -> i % 2 == 0).toList();
+    assertThat(list, is(equalTo(ImmutableList.of(2, 4, 6, 8, 10))));
   }
 
   @Test
   public void sizeTest() {
-    Sequence<Integer> list = Sequence.range(1, 10);
-    long size = Sequence.it(list).filter(i -> i % 2 == 0).size();
+    Sequence<Integer> seq = Sequence.range(1, 10);
+    long size = Sequence.it(seq).filter(i -> i % 2 == 0).size();
     assertEquals(5, size);
   }
 }

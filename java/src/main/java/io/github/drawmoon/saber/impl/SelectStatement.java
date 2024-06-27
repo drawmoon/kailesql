@@ -28,7 +28,6 @@ import static io.github.drawmoon.saber.common.Preconditions.ensureNull;
 
 import io.github.drawmoon.saber.*;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nonnull;
 
@@ -94,8 +93,7 @@ final class SelectStatement implements Select {
   @Nonnull
   @Override
   public Select orderBy(OrderField... f) {
-    LinkedList<OrderField> fields =
-        collectionNullClean(Arrays.asList(f), "order fields cannot be null");
+    List<OrderField> fields = collectionNullClean(Arrays.asList(f), "order fields cannot be null");
 
     if (this.orders == null) this.orders = fields;
     else this.orders.addAll(fields);
@@ -105,8 +103,7 @@ final class SelectStatement implements Select {
   @Nonnull
   @Override
   public Select groupBy(GroupField... f) {
-    LinkedList<GroupField> fields =
-        collectionNullClean(Arrays.asList(f), "group fields cannot be null");
+    List<GroupField> fields = collectionNullClean(Arrays.asList(f), "group fields cannot be null");
 
     if (this.groups == null) this.groups = fields;
     else this.groups.addAll(fields);

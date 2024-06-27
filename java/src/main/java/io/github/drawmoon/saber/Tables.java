@@ -21,69 +21,70 @@
  */
 package io.github.drawmoon.saber;
 
-import com.google.errorprone.annotations.DoNotCall;
-import io.github.drawmoon.saber.common.Enumerable;
-
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.util.function.Consumer;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 
 /** A set of {@link Table}. */
+@SuppressWarnings("unused")
 public interface Tables extends Table {
 
-    /**
-     * Gets the tables.
-     * @return returns the tables, not null
-     */
-    @Nonnull
-    List<Table> getTables();
+  /**
+   * Gets a table from this set.
+   *
+   * @param t the table name, not null
+   * @return returns the table
+   */
+  @CheckForNull
+  Table getTable(String t);
 
-    /**
-     * Gets a table from this set.
-     * @param t the table name, not null
-     * @return returns the table, not null
-     */
-    @CheckForNull
-    Table getTable(String t);
+  /**
+   * Appends the table.
+   *
+   * @param t the table, not null
+   * @return the new tables, not null
+   */
+  @CanIgnoreReturnValue
+  @Nonnull
+  Tables append(@CheckForNull Table t);
 
-    /**
-     * Appends the table.
-     * @param t the table, not null
-     * @return the new tables, not null
-     */
-    @Nonnull
-    Tables append(@CheckForNull Table t);
+  /**
+   * Inserts the table.
+   *
+   * @param index the index
+   * @param t the table, not null
+   * @throws IndexOutOfBoundsException if index is negative or greater than {@code size()}, or
+   *     offset or len are negative
+   * @return the new tables, not null
+   */
+  @CanIgnoreReturnValue
+  @Nonnull
+  Tables insert(int index, @CheckForNull Table t);
 
-    /**
-     * Inserts the table.
-     * @param index the index
-     * @param t the table, not null
-     *
-     * @throws IndexOutOfBoundsException if index is negative or greater than {@code size()}, or offset or len are negative
-     * @return the new tables, not null
-     */
-    @Nonnull
-    Tables insert(int index, @CheckForNull Table t);
+  /**
+   * Perform the given action for each {@link Table} until all elements have been processed.
+   *
+   * @param action the action
+   */
+  void forEachTable(Consumer<Table> action);
 
-    @DoNotCall
-    @Nonnull
-    @Override
-    default Table as(String alias) {
-        throw new UnsupportedOperationException();
-    }
+  @Nonnull
+  @Override
+  default Table as(String alias) {
+    throw new UnsupportedOperationException();
+  }
 
-    @DoNotCall
-    @Nonnull
-    @Override
-    default Asterisk asterisk() {
-        throw new UnsupportedOperationException();
-    }
+  @Nonnull
+  @Override
+  default Asterisk asterisk() {
+    throw new UnsupportedOperationException();
+  }
 
-    @DoNotCall
-    @Nonnull
-    @Override
-    default Table join(Table t, JoinType jt, @Nullable JoinHint jh) {
-        throw new UnsupportedOperationException();
-    }
+  @Nonnull
+  @Override
+  default Table join(Table t, JoinType jt, @Nullable JoinHint jh) {
+    throw new UnsupportedOperationException();
+  }
 }

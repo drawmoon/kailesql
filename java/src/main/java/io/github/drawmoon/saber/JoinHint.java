@@ -31,7 +31,7 @@ public enum JoinHint {
   MERGE("merge"),
   REMOTE("remote");
 
-  private final Keyword keyword;
+  private final String keyword;
 
   /**
    * Constructor.
@@ -39,7 +39,7 @@ public enum JoinHint {
    * @param keyword the keyword, not null
    */
   private JoinHint(String keyword) {
-    this.keyword = Keyword.keyword(keyword);
+    this.keyword = keyword;
   }
 
   /**
@@ -50,6 +50,6 @@ public enum JoinHint {
    */
   @Nonnull
   public String accept(@CheckForNull SqlGenerator gen) {
-    return this.keyword.accept(gen);
+    return Keyword.keyword(this.keyword).accept(gen);
   }
 }

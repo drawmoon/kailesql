@@ -41,15 +41,15 @@ public enum Comparator {
   IS_NULL("is null"),
   IS_NOT_NULL("is not null");
 
-  private final Keyword keyword;
+  private final String keyword;
 
   /**
    * Constructor.
    *
    * @param keyword the keyword, not null
    */
-  private Comparator(String keyword) {
-    this.keyword = Keyword.keyword(keyword);
+  Comparator(String keyword) {
+    this.keyword = keyword;
   }
 
   /**
@@ -60,6 +60,6 @@ public enum Comparator {
    */
   @Nonnull
   public String accept(@CheckForNull SqlGenerator gen) {
-    return this.keyword.accept(gen);
+    return Keyword.keyword(this.keyword).accept(gen);
   }
 }

@@ -22,4 +22,10 @@
 package io.github.drawmoon.saber;
 
 /** A placeholder for all fields in a table. */
-public interface Asterisk extends Field {}
+public interface Asterisk extends Field {
+
+  @Override
+  default String getName() {
+    throw new UnsupportedOperationException();
+  }
+}

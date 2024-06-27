@@ -22,6 +22,23 @@
 package io.github.drawmoon.saber;
 
 import io.github.drawmoon.saber.common.Enumerable;
+import io.github.drawmoon.saber.common.Sequence;
+import java.util.ArrayList;
+import java.util.function.Function;
+import javax.annotation.Nonnull;
 
 /** The common base type for all operate objects. */
-public interface Expression extends Enumerable<Expression>, Cloneable {}
+public interface Expression extends Enumerable<Expression>, Cloneable {
+
+  @Nonnull
+  @Override
+  default ArrayList<Expression> toList() {
+    return Sequence.it(this.iterator()).toList();
+  }
+
+  @Nonnull
+  @Override
+  default <R> Enumerable<R> collect(Function<? super Expression, ? extends R> function) {
+    return Sequence.it(this.iterator()).collect(function);
+  }
+}

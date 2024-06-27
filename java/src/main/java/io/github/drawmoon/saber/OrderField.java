@@ -22,4 +22,4 @@
 package io.github.drawmoon.saber;
 
 /** A field that can be used to order a query. */
-public interface OrderField extends Field {}
+public interface OrderField extends TableField {}

@@ -21,36 +21,55 @@
  */
 package io.github.drawmoon.saber.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import io.github.drawmoon.saber.Expression;
+import io.github.drawmoon.saber.ExpressionIterator;
 import io.github.drawmoon.saber.Field;
 import io.github.drawmoon.saber.Fields;
-import io.github.drawmoon.saber.common.Enumerable;
-import java.util.ArrayList;
+import io.github.drawmoon.saber.common.Sequence;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Optional;
+import java.util.function.Consumer;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 /** A field set expression. */
+@SuppressWarnings("unused")
 public class FieldsExpression implements Fields, Expression {
 
   List<Field> fields;
 
+  @CheckForNull
+  @Override
+  public Field getField(String f) {
+    Optional<Field> o = Sequence.it(this.fields).find(t -> f.equals(t.getName()));
+    return o.orElse(null);
+  }
+
   @Nonnull
   @Override
-  public <R> Enumerable<R> collect(Function<? super Expression, ? extends R> function) {
+  public Fields append(@CheckForNull Field f) {
     throw new UnsupportedOperationException();
   }
 
   @Nonnull
   @Override
-  public ArrayList<Expression> toList() {
+  public Fields insert(int index, @CheckForNull Field f) {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void forEachField(Consumer<Field> action) {
+    checkNotNull(action);
+
+    for (Field f : this.fields) action.accept(f);
   }
 
   @Nonnull
   @Override
   public Iterator<Expression> iterator() {
-    throw new UnsupportedOperationException();
+    return ExpressionIterator.sameAsExpression(this.fields.toArray());
   }
 }

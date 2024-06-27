@@ -26,14 +26,9 @@ import static io.github.drawmoon.saber.common.Preconditions.checkNotWhiteSpace;
 import static io.github.drawmoon.saber.common.Preconditions.ensureNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.errorprone.annotations.DoNotCall;
-import io.github.drawmoon.saber.Asterisk;
-import io.github.drawmoon.saber.Condition;
-import io.github.drawmoon.saber.Field;
-import io.github.drawmoon.saber.JoinHint;
-import io.github.drawmoon.saber.JoinType;
-import io.github.drawmoon.saber.Schema;
-import io.github.drawmoon.saber.Table;
+import io.github.drawmoon.saber.*;
+import java.util.Iterator;
+import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,7 +38,7 @@ import javax.annotation.Nullable;
  *
  * <p>A table consisting of two joined tables and possibly a join condition.
  */
-public class JoinExpression implements Table {
+public class JoinExpression implements Table, Expression {
 
   String alias;
   Table lhs;
@@ -51,24 +46,33 @@ public class JoinExpression implements Table {
   JoinType type;
   JoinHint hint;
   Condition condition;
-  ImmutableList<Field> fields;
+  ImmutableList<TableField> fields;
 
   @Override
   @CheckForNull
-  @DoNotCall
   public Schema getSchema() {
     throw new UnsupportedOperationException();
   }
 
   @Override
+  public String getName() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public String getAlias() {
+    return this.alias;
+  }
+
+  @Override
   @CheckForNull
-  public ImmutableList<Field> getFields() {
+  public List<TableField> getFields() {
     return this.fields;
   }
 
   @Override
   @CheckForNull
-  public Field getField(String f) {
+  public TableField getField(String f) {
     checkNotWhiteSpace(f, "field cannot be null");
 
     if (this.fields == null) return null;
@@ -99,6 +103,7 @@ public class JoinExpression implements Table {
     throw new UnsupportedOperationException();
   }
 
+  // -----------------------------------------------------------------------
   @Nonnull
   @Override
   public Table useIndex(String... i) {
@@ -169,5 +174,12 @@ public class JoinExpression implements Table {
   @Override
   public Table forceIndexForGroupBy(String... i) {
     throw new UnsupportedOperationException();
+  }
+
+  // -----------------------------------------------------------------------
+  @Nonnull
+  @Override
+  public Iterator<Expression> iterator() {
+    return ExpressionIterator.sameAsExpression(this.lhs, this.rhs, this.condition);
   }
 }
