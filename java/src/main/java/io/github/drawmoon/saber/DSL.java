@@ -21,7 +21,5 @@
  */
 package io.github.drawmoon.saber;
 
-/** Enum for the supported SQL dialect. */
-public enum SqlDialect {
-  MY_SQL;
-}
+/** */
+public class DSL {}
