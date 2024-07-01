@@ -30,6 +30,16 @@ import javax.annotation.Nonnull;
 /** The common base type for all operate objects. */
 public interface Expression extends Enumerable<Expression>, Cloneable {
 
+  /**
+   * Accepts a visitor and returns a result of type T.
+   *
+   * @param <T> the type of the result
+   * @param visitor the visitor to accept
+   * @return the result of accepting the visitor
+   */
+  @Nonnull
+  <T> T accept(Visitor<T> visitor);
+
   @Nonnull
   @Override
   default ArrayList<Expression> toList() {

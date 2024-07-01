@@ -24,6 +24,7 @@ package io.github.drawmoon.saber.impl;
 import io.github.drawmoon.saber.Expression;
 import io.github.drawmoon.saber.ExpressionIterator;
 import io.github.drawmoon.saber.Field;
+import io.github.drawmoon.saber.Visitor;
 import io.github.drawmoon.saber.common.Enumerable;
 import java.util.Iterator;
 import java.util.function.Function;
@@ -35,9 +36,16 @@ public class DistinctExpression implements Field, Expression {
 
   Field field;
 
+  // -----------------------------------------------------------------------
   @Override
   public String getName() {
     return this.field.getName();
+  }
+
+  @Nonnull
+  @Override
+  public <T> T accept(Visitor<T> visitor) {
+    return visitor.visitDistinct(this);
   }
 
   @Nonnull

@@ -48,6 +48,7 @@ public class JoinExpression implements Table, Expression {
   Condition condition;
   ImmutableList<TableField> fields;
 
+  // -----------------------------------------------------------------------
   @Override
   @CheckForNull
   public Schema getSchema() {
@@ -177,6 +178,12 @@ public class JoinExpression implements Table, Expression {
   }
 
   // -----------------------------------------------------------------------
+  @Nonnull
+  @Override
+  public <T> T accept(Visitor<T> visitor) {
+    return visitor.visitJoin(this);
+  }
+
   @Nonnull
   @Override
   public Iterator<Expression> iterator() {

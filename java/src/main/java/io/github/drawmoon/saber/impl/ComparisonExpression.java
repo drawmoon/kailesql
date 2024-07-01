@@ -21,10 +21,7 @@
  */
 package io.github.drawmoon.saber.impl;
 
-import io.github.drawmoon.saber.Comparator;
-import io.github.drawmoon.saber.Condition;
-import io.github.drawmoon.saber.Expression;
-import io.github.drawmoon.saber.ExpressionIterator;
+import io.github.drawmoon.saber.*;
 import java.util.Iterator;
 import javax.annotation.Nonnull;
 
@@ -34,6 +31,13 @@ public class ComparisonExpression implements Condition {
   Expression left;
   Comparator operator;
   Expression right;
+
+  // -----------------------------------------------------------------------
+  @Nonnull
+  @Override
+  public <T> T accept(Visitor<T> visitor) {
+    return visitor.visitComparison(this);
+  }
 
   @Nonnull
   @Override

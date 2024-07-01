@@ -44,6 +44,7 @@ public class TablesExpression implements Tables, Expression {
   List<Table> tables;
   ImmutableList<TableField> fields;
 
+  // -----------------------------------------------------------------------
   @CheckForNull
   @Override
   public Schema getSchema() {
@@ -198,6 +199,12 @@ public class TablesExpression implements Tables, Expression {
   }
 
   // -----------------------------------------------------------------------
+  @Nonnull
+  @Override
+  public <T> T accept(Visitor<T> visitor) {
+    return visitor.visitTables(this);
+  }
+
   @Nonnull
   @Override
   public Iterator<Expression> iterator() {

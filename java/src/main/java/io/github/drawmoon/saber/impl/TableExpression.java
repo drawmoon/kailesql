@@ -21,9 +21,7 @@
  */
 package io.github.drawmoon.saber.impl;
 
-import static io.github.drawmoon.saber.common.Preconditions.checkNotNull;
-import static io.github.drawmoon.saber.common.Preconditions.checkNotWhiteSpace;
-import static io.github.drawmoon.saber.common.Preconditions.ensureNull;
+import static io.github.drawmoon.saber.common.Preconditions.*;
 
 import io.github.drawmoon.saber.*;
 import io.github.drawmoon.saber.common.Sequence;
@@ -36,11 +34,76 @@ import javax.annotation.Nullable;
 /** A table expression. */
 public final class TableExpression implements Table, Expression {
 
-  String name;
-  String alias;
+  final String name;
+  final List<TableField> fields;
   Schema schema;
-  List<TableField> fields;
+  String alias;
 
+  /**
+   * Constructor.
+   *
+   * @param name the name of the table.
+   * @param schema the schema of the table.
+   * @param fields the fields of the table.
+   */
+  private TableExpression(String name, Schema schema, List<TableField> fields) {
+    this.name = name;
+    this.schema = schema;
+    this.fields = fields;
+  }
+
+  /**
+   * Create a new table expression from a meta-table.
+   *
+   * @param table the meta-table, not null
+   * @return the new table expression
+   */
+  @Nonnull
+  public static TableExpression of(@CheckForNull MetaTable table) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Create a new table expression.
+   *
+   * @param name the table name, not null
+   * @param fields the fields of the table, not null
+   * @return the new table expression
+   */
+  @Nonnull
+  public static TableExpression of(String name, List<TableField> fields) {
+    return of(name, (Schema) null, fields);
+  }
+
+  /**
+   * Create a new table expression.
+   *
+   * @param name the table name, not null
+   * @param schema the schema of the table, not null
+   * @param fields the fields of the table, not null
+   * @return the new table expression
+   */
+  @Nonnull
+  public static TableExpression of(String name, String schema, List<TableField> fields) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Create a new table expression.
+   *
+   * @param name the table name, not null
+   * @param schema the schema of the table, not null
+   * @param fields the fields of the table, not null
+   * @return the new table expression
+   */
+  @Nonnull
+  public static TableExpression of(String name, Schema schema, List<TableField> fields) {
+    checkNotWhiteSpace(name);
+    checkNotNull(schema, fields);
+    return new TableExpression(name, schema, fields);
+  }
+
+  // -----------------------------------------------------------------------
   @Override
   @CheckForNull
   public Schema getSchema() {
@@ -170,6 +233,12 @@ public final class TableExpression implements Table, Expression {
   }
 
   // -----------------------------------------------------------------------
+  @Nonnull
+  @Override
+  public <T> T accept(Visitor<T> visitor) {
+    return visitor.visitTable(this);
+  }
+
   @Nonnull
   @Override
   public Iterator<Expression> iterator() {

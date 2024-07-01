@@ -33,7 +33,6 @@ public final class Keyword {
 
   private Keyword(@CheckForNull String keyword) {
     checkNotWhiteSpace(keyword);
-
     this.keyword = keyword;
   }
 
@@ -44,18 +43,24 @@ public final class Keyword {
    * @return The {@link Keyword} object, not null
    */
   @Nonnull
-  public static Keyword keyword(@CheckForNull String keyword) {
+  public static Keyword of(@CheckForNull String keyword) {
+    checkNotWhiteSpace(keyword);
     return new Keyword(keyword);
   }
 
-  /**
-   * Accept a {@link SqlGenerator} object in order to render a SQL string or to bind its variables.
-   *
-   * @param gen The {@link SqlGenerator} object to accept, not null
-   * @return The rendered SQL string, not null
-   */
+  // -----------------------------------------------------------------------
   @Nonnull
-  public String accept(@CheckForNull SqlGenerator gen) {
-    return keyword; // TODO: Implementing dsl style formatting
+  public String asis() {
+    return this.keyword;
+  }
+
+  @Nonnull
+  public String lower() {
+    return this.keyword.toLowerCase();
+  }
+
+  @Nonnull
+  public String upper() {
+    return this.keyword.toUpperCase();
   }
 }

@@ -61,6 +61,13 @@ public class AsteriskExpression implements Asterisk, Expression {
     return new AsteriskExpression(table);
   }
 
+  // -----------------------------------------------------------------------
+  @Nonnull
+  @Override
+  public <T> T accept(Visitor<T> visitor) {
+    return visitor.visitAsterisk(this);
+  }
+
   @Nonnull
   @Override
   public Iterator<Expression> iterator() {

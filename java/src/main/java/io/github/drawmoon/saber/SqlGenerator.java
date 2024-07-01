@@ -21,5 +21,34 @@
  */
 package io.github.drawmoon.saber;
 
+import javax.annotation.Nonnull;
+
 /** A SQL generator. */
-public interface SqlGenerator {}
+public interface SqlGenerator<T> {
+
+  /**
+   * Render the SQL.
+   *
+   * @return the SQL
+   */
+  @Nonnull
+  String render();
+
+  /**
+   * Visit a {@link Keyword}.
+   *
+   * @param keyword the keyword, not null
+   * @return the result
+   */
+  @Nonnull
+  T visitKeyword(Keyword keyword);
+
+  /**
+   * Visit a {@link Select}.
+   *
+   * @param select the select, not null
+   * @return the result
+   */
+  @Nonnull
+  T visitSubquery(Select select);
+}

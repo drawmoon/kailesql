@@ -21,12 +21,10 @@
  */
 package io.github.drawmoon.saber.impl;
 
+import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import io.github.drawmoon.saber.Expression;
-import io.github.drawmoon.saber.ExpressionIterator;
-import io.github.drawmoon.saber.Field;
-import io.github.drawmoon.saber.Fields;
+import io.github.drawmoon.saber.*;
 import io.github.drawmoon.saber.common.Sequence;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +39,7 @@ public class FieldsExpression implements Fields, Expression {
 
   List<Field> fields;
 
+  // -----------------------------------------------------------------------
   @CheckForNull
   @Override
   public Field getField(String f) {
@@ -51,20 +50,30 @@ public class FieldsExpression implements Fields, Expression {
   @Nonnull
   @Override
   public Fields append(@CheckForNull Field f) {
-    throw new UnsupportedOperationException();
+    checkNotNull(f);
+    this.fields.add(f);
+    return this;
   }
 
   @Nonnull
   @Override
   public Fields insert(int index, @CheckForNull Field f) {
-    throw new UnsupportedOperationException();
+    checkNotNull(f);
+    checkElementIndex(index, this.fields.size());
+    this.fields.add(index, f);
+    return this;
   }
 
   @Override
   public void forEachField(Consumer<Field> action) {
     checkNotNull(action);
-
     for (Field f : this.fields) action.accept(f);
+  }
+
+  @Nonnull
+  @Override
+  public <T> T accept(Visitor<T> visitor) {
+    return visitor.visitFields(this);
   }
 
   @Nonnull

@@ -21,11 +21,36 @@
  */
 package io.github.drawmoon.saber;
 
-/** Enum for the supported SQL dialect. */
-public enum SqlDialect {
-  /** The MySQL dialect. */
-  MYSQL,
+import io.github.drawmoon.saber.impl.*;
+import javax.annotation.Nonnull;
 
-  /** The Postgres dialect. */
-  POSTGRES;
+/** A expression visitor. */
+public interface Visitor<T> {
+
+  @Nonnull
+  T visitDistinct(DistinctExpression distinct);
+
+  @Nonnull
+  T visitAsterisk(AsteriskExpression asterisk);
+
+  @Nonnull
+  T visitFields(FieldsExpression fields);
+
+  @Nonnull
+  T visitTableField(TableFieldExpression tableField);
+
+  @Nonnull
+  T visitTables(TablesExpression tables);
+
+  @Nonnull
+  T visitTable(TableExpression table);
+
+  @Nonnull
+  T visitJoin(JoinExpression join);
+
+  @Nonnull
+  T visitComparison(ComparisonExpression comparison);
+
+  @Nonnull
+  T visitLogical(LogicalExpression logical);
 }

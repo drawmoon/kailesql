@@ -21,10 +21,7 @@
  */
 package io.github.drawmoon.saber.impl;
 
-import io.github.drawmoon.saber.Condition;
-import io.github.drawmoon.saber.Expression;
-import io.github.drawmoon.saber.ExpressionIterator;
-import io.github.drawmoon.saber.Operator;
+import io.github.drawmoon.saber.*;
 import java.util.Iterator;
 import javax.annotation.Nonnull;
 
@@ -39,6 +36,7 @@ public class LogicalExpression implements Condition {
   Condition right;
   Operator operator;
 
+  // -----------------------------------------------------------------------
   @Nonnull
   @Override
   public Condition and(Expression expr) {
@@ -49,6 +47,12 @@ public class LogicalExpression implements Condition {
   @Override
   public Condition or(Expression expr) {
     throw new UnsupportedOperationException();
+  }
+
+  @Nonnull
+  @Override
+  public <T> T accept(Visitor<T> visitor) {
+    return visitor.visitLogical(this);
   }
 
   @Nonnull

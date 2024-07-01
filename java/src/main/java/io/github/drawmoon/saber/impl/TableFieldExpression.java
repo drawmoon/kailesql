@@ -21,10 +21,7 @@
  */
 package io.github.drawmoon.saber.impl;
 
-import io.github.drawmoon.saber.Expression;
-import io.github.drawmoon.saber.ExpressionIterator;
-import io.github.drawmoon.saber.Table;
-import io.github.drawmoon.saber.TableField;
+import io.github.drawmoon.saber.*;
 import java.util.Iterator;
 import javax.annotation.Nonnull;
 
@@ -35,6 +32,7 @@ public class TableFieldExpression implements TableField, Expression {
   String alias;
   Table table;
 
+  // -----------------------------------------------------------------------
   @Override
   public String getName() {
     return this.name;
@@ -56,6 +54,12 @@ public class TableFieldExpression implements TableField, Expression {
   public TableField as(String alias) {
     this.alias = alias;
     return this;
+  }
+
+  @Nonnull
+  @Override
+  public <T> T accept(Visitor<T> visitor) {
+    return visitor.visitTableField(this);
   }
 
   @Nonnull

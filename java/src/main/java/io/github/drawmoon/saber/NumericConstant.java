@@ -21,11 +21,5 @@
  */
 package io.github.drawmoon.saber;
 
-/** Enum for the supported SQL dialect. */
-public enum SqlDialect {
-  /** The MySQL dialect. */
-  MYSQL,
-
-  /** The Postgres dialect. */
-  POSTGRES;
-}
+/** A numeric constant. */
+public interface NumericConstant<T> extends Constant<T> {}

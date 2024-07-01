@@ -24,8 +24,7 @@ package io.github.drawmoon.saber.impl;
 import io.github.drawmoon.saber.Variable;
 
 /** A bind variable. */
-public class Val implements Variable<String> {
+public class Val implements Variable<Object> {
 
   String name;
-  int inferredDataType;
 }
